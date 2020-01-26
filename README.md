@@ -1,4 +1,4 @@
-[docs](https://docs.iearn.finance)
+[iearn.finance](https://docs.iearn.finance)
 
 # Smart Contract Interface
 
