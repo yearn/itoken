@@ -1,150 +1,40 @@
 {
-  "contractName": "Fulcrum",
+  "contractName": "IIEarnManager",
   "abi": [
     {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "receiver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "maxPriceAllowed",
-          "type": "uint256"
-        }
-      ],
-      "name": "mintWithEther",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "mintAmount",
-          "type": "uint256"
-        }
-      ],
-      "payable": true,
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "receiver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "mint",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "mintAmount",
-          "type": "uint256"
-        }
-      ],
-      "payable": true,
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "receiver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "burnAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "minPriceAllowed",
-          "type": "uint256"
-        }
-      ],
-      "name": "burnToEther",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "loanAmountPaid",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "receiver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "burnAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "burn",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "loanAmountPaid",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "constant": true,
       "inputs": [
         {
           "internalType": "address",
-          "name": "_owner",
+          "name": "_token",
           "type": "address"
         }
       ],
-      "name": "balanceOf",
+      "name": "recommend",
       "outputs": [
         {
+          "internalType": "string",
+          "name": "choice",
+          "type": "string"
+        },
+        {
           "internalType": "uint256",
-          "name": "balance",
+          "name": "capr",
           "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "assetBalanceOf",
-      "outputs": [
+        },
         {
           "internalType": "uint256",
-          "name": "balance",
+          "name": "iapr",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "aapr",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "dapr",
           "type": "uint256"
         }
       ],
@@ -153,7 +43,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"assetBalanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"burnAmount\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"loanAmountPaid\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"burnAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"minPriceAllowed\",\"type\":\"uint256\"}],\"name\":\"burnToEther\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"loanAmountPaid\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"mintAmount\",\"type\":\"uint256\"}],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"maxPriceAllowed\",\"type\":\"uint256\"}],\"name\":\"mintWithEther\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"mintAmount\",\"type\":\"uint256\"}],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/IDAI.sol\":\"Fulcrum\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/IDAI.sol\":{\"keccak256\":\"0x9a5d792e808c56642fe5721a0c2f24f37aeb86f692e764be8fdd7b1fa5bde3d9\",\"urls\":[\"bzz-raw://0a552c2d1d504805da48cefba9ccf3d8d32e0ad1e52c720c85e05473153542ee\",\"dweb:/ipfs/QmUSF7TLFwYuKCpjnmxLooE6kL2KPHUQJ26fYXSMRp1gDu\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"}],\"name\":\"recommend\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"choice\",\"type\":\"string\"},{\"internalType\":\"uint256\",\"name\":\"capr\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"iapr\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"aapr\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"dapr\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/IDAI.sol\":\"IIEarnManager\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/IDAI.sol\":{\"keccak256\":\"0x9a5d792e808c56642fe5721a0c2f24f37aeb86f692e764be8fdd7b1fa5bde3d9\",\"urls\":[\"bzz-raw://0a552c2d1d504805da48cefba9ccf3d8d32e0ad1e52c720c85e05473153542ee\",\"dweb:/ipfs/QmUSF7TLFwYuKCpjnmxLooE6kL2KPHUQJ26fYXSMRp1gDu\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
@@ -72532,7 +72422,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-01-29T22:55:36.552Z",
+  "updatedAt": "2020-01-29T22:55:36.601Z",
   "devdoc": {
     "methods": {}
   },

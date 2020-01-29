@@ -864,6 +864,8 @@ contract IEther is ERC20, ERC20Detailed, ReentrancyGuard, Ownable {
 
   }
 
+
+
   // Invest ETH
   function invest()
       external
@@ -931,6 +933,7 @@ contract IEther is ERC20, ERC20Detailed, ReentrancyGuard, Ownable {
       uint256 ibalance = balanceOf(msg.sender);
       require(_shares <= ibalance, "insufficient balance");
 
+      // Could have over value from cTokens
       pool = calcPoolValueInETH();
       // Calc eth to redeem before updating balances
       uint256 ethToRedeem = (pool.mul(_shares)).div(_totalSupply);
@@ -944,10 +947,16 @@ contract IEther is ERC20, ERC20Detailed, ReentrancyGuard, Ownable {
       // Check ETH balance
       uint256 ethBalance = address(this).balance;
       if (ethBalance < ethToRedeem) {
+        // We try to get the remaining ETH portion
         uint conversionPortion = SafeMath.div(SafeMath.mul(ethToRedeem.sub(ethBalance), 505), 1000);
         uint tokensToSell = UniSwap_ETH_CDAIZap(ZAP_ADDRESS).calcReturnSharesFromETH(conversionPortion);
         IERC20(UniSwap_ETH_CDAIZap(ZAP_ADDRESS).getUniswapExchangeContractAddress()).approve(address(ZAP_ADDRESS), tokensToSell);
-        ethToRedeem = UniSwap_ETH_CDAIZap(ZAP_ADDRESS).Redeem(address(this), tokensToSell);
+        uint256 ethRedeemed = UniSwap_ETH_CDAIZap(ZAP_ADDRESS).Redeem(address(this), tokensToSell);
+        if (ethRedeemed < ethToRedeem) {
+          ethToRedeem = ethRedeemed;
+        }
+        // Add ETH in contract as value
+        ethToRedeem = ethToRedeem.add(ethBalance);
       }
 
       (bool result, ) = msg.sender.call.value(ethToRedeem)("");

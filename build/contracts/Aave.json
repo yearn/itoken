@@ -1,85 +1,27 @@
 {
-  "contractName": "Fulcrum",
+  "contractName": "Aave",
   "abi": [
     {
       "constant": false,
       "inputs": [
         {
           "internalType": "address",
-          "name": "receiver",
+          "name": "_reserve",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "maxPriceAllowed",
-          "type": "uint256"
-        }
-      ],
-      "name": "mintWithEther",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "mintAmount",
-          "type": "uint256"
-        }
-      ],
-      "payable": true,
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "receiver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "mint",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "mintAmount",
-          "type": "uint256"
-        }
-      ],
-      "payable": true,
-      "stateMutability": "payable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "receiver",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "burnAmount",
+          "name": "_amount",
           "type": "uint256"
         },
         {
-          "internalType": "uint256",
-          "name": "minPriceAllowed",
-          "type": "uint256"
+          "internalType": "uint16",
+          "name": "_referralCode",
+          "type": "uint16"
         }
       ],
-      "name": "burnToEther",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "loanAmountPaid",
-          "type": "uint256"
-        }
-      ],
+      "name": "deposit",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -89,23 +31,27 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "receiver",
+          "name": "_reserve",
+          "type": "address"
+        },
+        {
+          "internalType": "address payable",
+          "name": "_user",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "burnAmount",
+          "name": "_amount",
           "type": "uint256"
-        }
-      ],
-      "name": "burn",
-      "outputs": [
+        },
         {
           "internalType": "uint256",
-          "name": "loanAmountPaid",
+          "name": "_aTokenBalanceAfterRedeem",
           "type": "uint256"
         }
       ],
+      "name": "redeemUnderlying",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
@@ -130,30 +76,9 @@
       "payable": false,
       "stateMutability": "view",
       "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "assetBalanceOf",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "balance",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"assetBalanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"burnAmount\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"loanAmountPaid\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"burnAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"minPriceAllowed\",\"type\":\"uint256\"}],\"name\":\"burnToEther\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"loanAmountPaid\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"mintAmount\",\"type\":\"uint256\"}],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"maxPriceAllowed\",\"type\":\"uint256\"}],\"name\":\"mintWithEther\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"mintAmount\",\"type\":\"uint256\"}],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/IDAI.sol\":\"Fulcrum\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/IDAI.sol\":{\"keccak256\":\"0x9a5d792e808c56642fe5721a0c2f24f37aeb86f692e764be8fdd7b1fa5bde3d9\",\"urls\":[\"bzz-raw://0a552c2d1d504805da48cefba9ccf3d8d32e0ad1e52c720c85e05473153542ee\",\"dweb:/ipfs/QmUSF7TLFwYuKCpjnmxLooE6kL2KPHUQJ26fYXSMRp1gDu\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_reserve\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint16\",\"name\":\"_referralCode\",\"type\":\"uint16\"}],\"name\":\"deposit\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"_reserve\",\"type\":\"address\"},{\"internalType\":\"address payable\",\"name\":\"_user\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_aTokenBalanceAfterRedeem\",\"type\":\"uint256\"}],\"name\":\"redeemUnderlying\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/IDAI.sol\":\"Aave\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/IDAI.sol\":{\"keccak256\":\"0x9a5d792e808c56642fe5721a0c2f24f37aeb86f692e764be8fdd7b1fa5bde3d9\",\"urls\":[\"bzz-raw://0a552c2d1d504805da48cefba9ccf3d8d32e0ad1e52c720c85e05473153542ee\",\"dweb:/ipfs/QmUSF7TLFwYuKCpjnmxLooE6kL2KPHUQJ26fYXSMRp1gDu\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
@@ -72532,7 +72457,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-01-29T22:55:36.552Z",
+  "updatedAt": "2020-01-29T22:55:36.330Z",
   "devdoc": {
     "methods": {}
   },
