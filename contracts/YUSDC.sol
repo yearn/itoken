@@ -390,7 +390,7 @@ contract yUSDC is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
 
   Lender public provider = Lender.NONE;
 
-  constructor () public ERC20Detailed("yUSDC", "yUSDC", 18) {
+  constructor () public ERC20Detailed("yUSDC", "yUSDC", 6) {
     token = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     apr = address(0x318135fbD0b40D48fCEF431CCdF6C7926450edFB);
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
