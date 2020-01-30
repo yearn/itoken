@@ -275,20 +275,14 @@ library SafeERC20 {
 }
 
 interface Compound {
-    function approve ( address spender, uint256 amount ) external returns ( bool );
     function mint ( uint256 mintAmount ) external returns ( uint256 );
-    function balanceOf(address _owner) external view returns (uint256 balance);
-    function transfer(address _to, uint _value) external returns (bool success);
     function redeem(uint256 redeemTokens) external returns (uint256);
     function exchangeRateStored() external view returns (uint);
 }
 
 interface Fulcrum {
-    function mintWithEther(address receiver, uint256 maxPriceAllowed) external payable returns (uint256 mintAmount);
     function mint(address receiver, uint256 amount) external payable returns (uint256 mintAmount);
-    function burnToEther(address receiver, uint256 burnAmount, uint256 minPriceAllowed) external returns (uint256 loanAmountPaid);
     function burn(address receiver, uint256 burnAmount) external returns (uint256 loanAmountPaid);
-    function balanceOf(address _owner) external view returns (uint256 balance);
     function assetBalanceOf(address _owner) external view returns (uint256 balance);
 }
 
@@ -298,13 +292,10 @@ interface ILendingPoolAddressesProvider {
 
 interface Aave {
     function deposit(address _reserve, uint256 _amount, uint16 _referralCode) external;
-    function redeemUnderlying(address _reserve, address payable _user, uint256 _amount, uint256 _aTokenBalanceAfterRedeem) external;
-    function balanceOf(address _owner) external view returns (uint256 balance);
 }
 
 interface AToken {
     function redeem(uint256 amount) external;
-    function balanceOf(address _owner) external view returns (uint256 balance);
 }
 
 interface IIEarnManager {
@@ -322,31 +313,17 @@ contract Structs {
         uint256 value;
     }
 
-    struct TotalPar {
-        uint128 borrow;
-        uint128 supply;
-    }
-
     enum ActionType {
         Deposit,   // supply tokens
-        Withdraw,  // borrow tokens
-        Transfer,  // transfer balance between accounts
-        Buy,       // buy an amount of some token (externally)
-        Sell,      // sell an amount of some token (externally)
-        Trade,     // trade tokens against another account
-        Liquidate, // liquidate an undercollateralized or expiring account
-        Vaporize,  // use excess tokens to zero-out a completely negative account
-        Call       // send arbitrary data to an address
+        Withdraw  // borrow tokens
     }
 
     enum AssetDenomination {
-        Wei, // the amount is denominated in wei
-        Par  // the amount is denominated in par
+        Wei // the amount is denominated in wei
     }
 
     enum AssetReference {
-        Delta, // the amount is given as a delta from the current value
-        Target // the amount is given as an exact number to end up at
+        Delta // the amount is given as a delta from the current value
     }
 
     struct AssetAmount {
@@ -379,14 +356,16 @@ contract Structs {
 }
 
 contract DyDx is Structs {
-    function getEarningsRate() public view returns (Val memory);
-    function getMarketInterestRate(uint256 marketId) public view returns (Val memory);
-    function getMarketTotalPar(uint256 marketId) public view returns (TotalPar memory);
     function getAccountWei(Info memory account, uint256 marketId) public view returns (Wei memory);
     function operate(Info[] memory, ActionArgs[] memory) public;
 }
 
-contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
+interface LendingPoolAddressesProvider {
+    function getLendingPool() external view returns (address);
+    function getLendingPoolCore() external view returns (address);
+}
+
+contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
   using SafeERC20 for IERC20;
   using Address for address;
   using SafeMath for uint256;
@@ -411,22 +390,41 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
 
   Lender public provider = Lender.NONE;
 
-  constructor () public ERC20Detailed("iDAI", "iDAI", 18) {
-    apr = address(0x9CaD8AB10daA9AF1a9D2B878541f41b697268eEC);
+  constructor () public ERC20Detailed("yDAI", "yDAI", 18) {
+    token = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    apr = address(0x318135fbD0b40D48fCEF431CCdF6C7926450edFB);
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
     aave = address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
     fulcrum = address(0x493C57C4763932315A328269E1ADaD09653B9081);
     aaveToken = address(0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d);
     compound = address(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-    dToken = 1;
+    dToken = 3;
+    approveToken();
+  }
+  function set_new_AAVE(address _new_AAVE) public onlyOwner {
+      aave = _new_AAVE;
+  }
+  function set_new_DYDX(address _new_DYDX) public onlyOwner {
+      dydx = _new_DYDX;
+  }
+  function set_new_APR(address _new_APR) public onlyOwner {
+      apr = _new_APR;
+  }
+  function set_new_FULCRUM(address _new_FULCRUM) public onlyOwner {
+      fulcrum = _new_FULCRUM;
+  }
+  function set_new_ATOKEN(address _new_ATOKEN) public onlyOwner {
+      aaveToken = _new_ATOKEN;
+  }
+  function set_new_COMPOUND(address _new_COMPOUND) public onlyOwner {
+      compound = _new_COMPOUND;
+  }
+  function set_new_DTOKEN(uint256 _new_DTOKEN) public onlyOwner {
+      dToken = _new_DTOKEN;
   }
 
   function() external payable {
 
-  }
-
-  function set_new_APR(address _new_APR) public onlyOwner {
-      apr = _new_APR;
   }
 
   function recommend() public view returns (Lender) {
@@ -445,20 +443,20 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       max = dapr;
     }
 
-    Lender newLender = Lender.NONE;
+    Lender newProvider = Lender.NONE;
     if (max == dapr) {
-      newLender = Lender.DYDX;
+      newProvider = Lender.DYDX;
     }
     if (max == aapr) {
-      newLender = Lender.AAVE;
+      newProvider = Lender.AAVE;
     }
     if (max == iapr) {
-      newLender = Lender.FULCRUM;
+      newProvider = Lender.FULCRUM;
     }
     if (max == capr) {
-      newLender = Lender.COMPOUND;
+      newProvider = Lender.COMPOUND;
     }
-    return newLender;
+    return newProvider;
   }
 
   function supplyDydx(uint256 amount) public returns(uint) {
@@ -483,7 +481,7 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       Info[] memory infos = new Info[](1);
       infos[0] = Info(address(this), 0);
 
-      AssetAmount memory amt = AssetAmount(true, AssetDenomination.Wei, AssetReference.Delta, amount);
+      AssetAmount memory amt = AssetAmount(false, AssetDenomination.Wei, AssetReference.Delta, amount);
       ActionArgs memory act;
       act.actionType = ActionType.Withdraw;
       act.accountId = 0;
@@ -501,10 +499,18 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     return IERC20(token).balanceOf(address(this));
   }
 
+  function getAave() public view returns (address) {
+    return LendingPoolAddressesProvider(aave).getLendingPool();
+  }
+  function getAaveCore() public view returns (address) {
+    return LendingPoolAddressesProvider(aave).getLendingPoolCore();
+  }
+
   function approveToken() public {
       IERC20(token).approve(compound, uint(-1)); //also add to constructor
       IERC20(token).approve(dydx, uint(-1));
-      IERC20(token).approve(aave, uint(-1));
+      IERC20(token).approve(getAave(), uint(-1));
+      IERC20(token).approve(getAaveCore(), uint(-1));
       IERC20(token).approve(fulcrum, uint(-1));
   }
 
@@ -534,9 +540,8 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     return IERC20(fulcrum).balanceOf(address(this));
   }
   function balanceAave() public view returns (uint256) {
-    return IERC20(aave).balanceOf(address(this));
+    return IERC20(aaveToken).balanceOf(address(this));
   }
-
 
   function withdrawAll() public {
     uint256 amount = balanceCompound();
@@ -557,16 +562,17 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     }
   }
 
+  function withdrawSomeCompound(uint256 _amount) public {
+    uint256 b = balanceCompound();
+    uint256 bT = balanceCompoundInToken();
+    require(bT >= _amount, "insufficient funds");
+    uint256 amount = b.mul(_amount).div(bT);
+    withdrawCompound(amount);
+  }
+
   function withdrawSome(uint256 _amount) public {
-    uint256 b;
-    uint256 bT;
-    uint256 amount;
     if (provider == Lender.COMPOUND) {
-      b = balanceCompound();
-      bT = balanceCompoundInToken();
-      require(bT >= _amount, "insufficient funds");
-      amount = b.mul(bT).div(_amount);
-      withdrawCompound(amount);
+      withdrawSomeCompound(_amount);
     }
     if (provider == Lender.AAVE) {
       require(balanceAave() >= _amount, "insufficient funds");
@@ -577,12 +583,7 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       withdrawDydx(_amount);
     }
     if (provider == Lender.FULCRUM) {
-      require(balanceFulcrum() >= _amount, "insufficient funds");
-      b = balanceFulcrum();
-      bT = balanceFulcrumInToken();
-      require(bT >= _amount, "insufficient funds");
-      amount = b.mul(bT).div(_amount);
-      withdrawFulcrum(amount);
+      withdrawFulcrum(_amount);
     }
   }
 
@@ -607,18 +608,18 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
         supplyAave(balance());
       }
     }
+    provider = newProvider;
   }
 
   function supplyAave(uint amount) public {
-    Aave(aave).deposit(token, amount, 0);
+      Aave(getAave()).deposit(token, amount, 0);
   }
   function supplyFulcrum(uint amount) public {
-    require(Fulcrum(fulcrum).mint(address(this), amount) > 0, "FULCRUM: supply failed");
+      require(Fulcrum(fulcrum).mint(address(this), amount) > 0, "FULCRUM: supply failed");
   }
   function supplyCompound(uint amount) public {
       require(Compound(compound).mint(amount) == 0, "COMPOUND: supply failed");
   }
-
   function withdrawAave(uint amount) public {
       AToken(aaveToken).redeem(amount);
   }
@@ -629,17 +630,9 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       require(Compound(compound).redeem(amount) == 0, "COMPOUND: withdraw failed");
   }
 
-  function set_new_AAVE(address _new_AAVE) public onlyOwner {
-      aave = _new_AAVE;
-  }
-  function set_new_DYDX(address _new_DYDX) public onlyOwner {
-      dydx = _new_DYDX;
-  }
-
   // Invest ETH
   function invest(uint256 _amount)
       external
-      payable
       nonReentrant
   {
       require(_amount > 0, "deposit must be greater than 0");
@@ -678,7 +671,8 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     return balanceCompoundInToken()
       .add(balanceFulcrumInToken())
       .add(balanceDydx())
-      .add(balanceAave());
+      .add(balanceAave())
+      .add(balance());
   }
 
   function getPricePerFullShare() public view returns (uint) {
@@ -714,6 +708,10 @@ contract iDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       }
 
       IERC20(token).transfer(msg.sender, r);
+
+      rebalance();
+      pool = calcPoolValueInToken();
+
   }
 
   // incase of half-way error
