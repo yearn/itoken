@@ -477,7 +477,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       DyDx(dydx).operate(infos, args);
   }
 
-  function withdrawDydx(uint256 amount) public {
+  function withdrawDydx(uint256 amount) internal {
       Info[] memory infos = new Info[](1);
       infos[0] = Info(address(this), 0);
 
@@ -543,7 +543,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     return IERC20(aaveToken).balanceOf(address(this));
   }
 
-  function withdrawAll() public {
+  function withdrawAll() internal {
     uint256 amount = balanceCompound();
     if (amount > 0) {
       withdrawCompound(amount);
@@ -562,7 +562,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     }
   }
 
-  function withdrawSomeCompound(uint256 _amount) public {
+  function withdrawSomeCompound(uint256 _amount) internal {
     uint256 b = balanceCompound();
     uint256 bT = balanceCompoundInToken();
     require(bT >= _amount, "insufficient funds");
@@ -570,7 +570,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     withdrawCompound(amount);
   }
 
-  function withdrawSome(uint256 _amount) public {
+  function withdrawSome(uint256 _amount) internal {
     if (provider == Lender.COMPOUND) {
       withdrawSomeCompound(_amount);
     }
@@ -620,13 +620,13 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
   function supplyCompound(uint amount) public {
       require(Compound(compound).mint(amount) == 0, "COMPOUND: supply failed");
   }
-  function withdrawAave(uint amount) public {
+  function withdrawAave(uint amount) internal {
       AToken(aaveToken).redeem(amount);
   }
-  function withdrawFulcrum(uint amount) public {
+  function withdrawFulcrum(uint amount) internal {
       require(Fulcrum(fulcrum).burn(address(this), amount) > 0, "FULCRUM: withdraw failed");
   }
-  function withdrawCompound(uint amount) public {
+  function withdrawCompound(uint amount) internal {
       require(Compound(compound).redeem(amount) == 0, "COMPOUND: withdraw failed");
   }
 
