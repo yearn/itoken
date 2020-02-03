@@ -365,6 +365,18 @@ interface LendingPoolAddressesProvider {
     function getLendingPoolCore() external view returns (address);
 }
 
+/*
+
+ Accept protocol 1 tokens and transfer them
+
+*/
+
+interface yERC20 {
+    function balanceOf(address account) external view returns (uint256);
+    function redeem(uint256 _shares) external;
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+}
+
 contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
   using SafeERC20 for IERC20;
   using Address for address;
@@ -379,13 +391,16 @@ contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
   address public dydx;
   uint256 public dToken;
   address public apr;
+  address public yUSDTv1;
 
   enum Lender {
       NONE,
       DYDX,
       COMPOUND,
       AAVE,
-      FULCRUM
+      FULCRUM,
+      DDEX,
+      LENDF
   }
 
   Lender public provider = Lender.NONE;
@@ -625,7 +640,6 @@ contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       require(Compound(compound).redeem(amount) == 0, "COMPOUND: withdraw failed");
   }
 
-  // Invest ETH
   function invest(uint256 _amount)
       external
       nonReentrant
@@ -634,6 +648,29 @@ contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       pool = calcPoolValueInToken();
 
       IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
+
+      rebalance();
+
+      // Calculate pool shares
+      uint256 shares = 0;
+      if (pool == 0) {
+        shares = _amount;
+        pool = _amount;
+      } else {
+        shares = (_amount.mul(_totalSupply)).div(pool);
+      }
+      pool = calcPoolValueInToken();
+      _mint(msg.sender, shares);
+  }
+
+  function investFor(uint256 _amount)
+      internal
+  {
+      require(_amount > 0, "deposit must be greater than 0");
+      require(balance() > _amount, "balance error");
+      pool = calcPoolValueInToken();
+
+      // Already own the DAI from redeem
 
       rebalance();
 
@@ -673,6 +710,20 @@ contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
   function getPricePerFullShare() public view returns (uint) {
     uint _pool = calcPoolValueInToken();
     return _pool.mul(1e18).div(_totalSupply);
+  }
+
+  function balanceOfV1(address _owner) public view returns (uint256) {
+    return yERC20(yUSDTv1).balanceOf(_owner);
+  }
+
+  // Swap from USDTv1 to USDTv2
+  function swap(uint256 _amount) external nonReentrant {
+    IERC20(yUSDTv1).safeTransferFrom(msg.sender, address(this), _amount);
+    uint256 b = IERC20(yUSDTv1).balanceOf(address(this));
+    yERC20(yUSDTv1).redeem(_amount);
+    uint256 newBalance = IERC20(yUSDTv1).balanceOf(address(this));
+    uint256 invested = newBalance.sub(b);
+    investFor(invested);
   }
 
   // Redeem any invested tokens from the pool

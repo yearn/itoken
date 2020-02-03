@@ -6,8 +6,6 @@ interface IyDAI {
 
   function supplyDydx(uint256 amount) external returns(uint);
 
-  function withdrawDydx(uint256 amount) external;
-
   function balance() external view returns (uint256);
 
   function getAave() external view returns (address);
