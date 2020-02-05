@@ -67,10 +67,10 @@
     "absolutePath": "/D/ftm/itoken/contracts/IIEther.sol",
     "exportedSymbols": {
       "IIEther": [
-        1769
+        1785
       ]
     },
-    "id": 1770,
+    "id": 1786,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -79,9 +79,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 1769,
+        "id": 1785,
         "linearizedBaseContracts": [
-          1769
+          1785
         ],
         "name": "IIEther",
         "nodeType": "ContractDefinition",
@@ -89,25 +89,25 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1753,
+            "id": 1769,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "invest",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1751,
+              "id": 1767,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "53:2:1"
             },
             "returnParameters": {
-              "id": 1752,
+              "id": 1768,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "72:0:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "38:35:1",
             "stateMutability": "payable",
             "superFunction": null,
@@ -116,28 +116,28 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1758,
+            "id": 1774,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "calcPoolValueInETH",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1754,
+              "id": 1770,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "103:2:1"
             },
             "returnParameters": {
-              "id": 1757,
+              "id": 1773,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1756,
+                  "id": 1772,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1758,
+                  "scope": 1774,
                   "src": "129:4:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -146,7 +146,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1755,
+                    "id": 1771,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "129:4:1",
@@ -161,7 +161,7 @@
               ],
               "src": "128:6:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "76:59:1",
             "stateMutability": "view",
             "superFunction": null,
@@ -170,28 +170,28 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1763,
+            "id": 1779,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getPricePerFullShare",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1759,
+              "id": 1775,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "167:2:1"
             },
             "returnParameters": {
-              "id": 1762,
+              "id": 1778,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1761,
+                  "id": 1777,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1763,
+                  "scope": 1779,
                   "src": "193:4:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -200,7 +200,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1760,
+                    "id": 1776,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "193:4:1",
@@ -215,7 +215,7 @@
               ],
               "src": "192:6:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "138:61:1",
             "stateMutability": "view",
             "superFunction": null,
@@ -224,22 +224,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1768,
+            "id": 1784,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "redeem",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1766,
+              "id": 1782,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1765,
+                  "id": 1781,
                   "name": "_shares",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1768,
+                  "scope": 1784,
                   "src": "264:15:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -248,7 +248,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1764,
+                    "id": 1780,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "264:7:1",
@@ -264,19 +264,19 @@
               "src": "263:17:1"
             },
             "returnParameters": {
-              "id": 1767,
+              "id": 1783,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "289:0:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "248:42:1",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1770,
+        "scope": 1786,
         "src": "0:292:1"
       }
     ],
@@ -286,10 +286,10 @@
     "absolutePath": "/D/ftm/itoken/contracts/IIEther.sol",
     "exportedSymbols": {
       "IIEther": [
-        1769
+        1785
       ]
     },
-    "id": 1770,
+    "id": 1786,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -298,9 +298,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 1769,
+        "id": 1785,
         "linearizedBaseContracts": [
-          1769
+          1785
         ],
         "name": "IIEther",
         "nodeType": "ContractDefinition",
@@ -308,25 +308,25 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1753,
+            "id": 1769,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "invest",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1751,
+              "id": 1767,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "53:2:1"
             },
             "returnParameters": {
-              "id": 1752,
+              "id": 1768,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "72:0:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "38:35:1",
             "stateMutability": "payable",
             "superFunction": null,
@@ -335,28 +335,28 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1758,
+            "id": 1774,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "calcPoolValueInETH",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1754,
+              "id": 1770,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "103:2:1"
             },
             "returnParameters": {
-              "id": 1757,
+              "id": 1773,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1756,
+                  "id": 1772,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1758,
+                  "scope": 1774,
                   "src": "129:4:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -365,7 +365,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1755,
+                    "id": 1771,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "129:4:1",
@@ -380,7 +380,7 @@
               ],
               "src": "128:6:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "76:59:1",
             "stateMutability": "view",
             "superFunction": null,
@@ -389,28 +389,28 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1763,
+            "id": 1779,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getPricePerFullShare",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1759,
+              "id": 1775,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "167:2:1"
             },
             "returnParameters": {
-              "id": 1762,
+              "id": 1778,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1761,
+                  "id": 1777,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1763,
+                  "scope": 1779,
                   "src": "193:4:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -419,7 +419,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1760,
+                    "id": 1776,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "193:4:1",
@@ -434,7 +434,7 @@
               ],
               "src": "192:6:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "138:61:1",
             "stateMutability": "view",
             "superFunction": null,
@@ -443,22 +443,22 @@
           {
             "body": null,
             "documentation": null,
-            "id": 1768,
+            "id": 1784,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "redeem",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 1766,
+              "id": 1782,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1765,
+                  "id": 1781,
                   "name": "_shares",
                   "nodeType": "VariableDeclaration",
-                  "scope": 1768,
+                  "scope": 1784,
                   "src": "264:15:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -467,7 +467,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 1764,
+                    "id": 1780,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "264:7:1",
@@ -483,19 +483,19 @@
               "src": "263:17:1"
             },
             "returnParameters": {
-              "id": 1767,
+              "id": 1783,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "289:0:1"
             },
-            "scope": 1769,
+            "scope": 1785,
             "src": "248:42:1",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 1770,
+        "scope": 1786,
         "src": "0:292:1"
       }
     ],
@@ -507,7 +507,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-01-26T08:39:20.993Z",
+  "updatedAt": "2020-02-05T00:37:11.465Z",
   "devdoc": {
     "methods": {}
   },
