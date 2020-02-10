@@ -391,17 +391,14 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     }
 
     Lender newProvider = Lender.NONE;
-    if (max == dapr) {
-      newProvider = Lender.DYDX;
-    }
-    if (max == aapr) {
-      newProvider = Lender.AAVE;
-    }
-    if (max == iapr) {
-      newProvider = Lender.FULCRUM;
-    }
     if (max == capr) {
       newProvider = Lender.COMPOUND;
+    } else if (max == iapr) {
+      newProvider = Lender.FULCRUM;
+    } else if (max == aapr) {
+      newProvider = Lender.AAVE;
+    } else if (max == dapr) {
+      newProvider = Lender.DYDX;
     }
     return newProvider;
   }
@@ -543,14 +540,28 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     if (balance() > 0) {
       if (newProvider == Lender.DYDX) {
         supplyDydx(balance());
-      }
-      if (newProvider == Lender.FULCRUM) {
+      } else if (newProvider == Lender.FULCRUM) {
         supplyFulcrum(balance());
-      }
-      if (newProvider == Lender.COMPOUND) {
+      } else if (newProvider == Lender.COMPOUND) {
         supplyCompound(balance());
+      } else if (newProvider == Lender.AAVE) {
+        supplyAave(balance());
       }
-      if (newProvider == Lender.AAVE) {
+    }
+
+    provider = newProvider;
+  }
+
+  // Internal only rebalance for better gas in redeem
+  function _rebalance(Lender newProvider) internal {
+    if (balance() > 0) {
+      if (newProvider == Lender.DYDX) {
+        supplyDydx(balance());
+      } else if (newProvider == Lender.FULCRUM) {
+        supplyFulcrum(balance());
+      } else if (newProvider == Lender.COMPOUND) {
+        supplyCompound(balance());
+      } else if (newProvider == Lender.AAVE) {
         supplyAave(balance());
       }
     }
@@ -688,13 +699,21 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
 
       // Check ETH balance
       uint256 b = IERC20(token).balanceOf(address(this));
+      Lender newProvider = provider;
       if (b < r) {
-        _withdrawSome(r.sub(b));
+        newProvider = recommend();
+        if (newProvider != provider) {
+          _withdrawAll();
+        } else {
+          _withdrawSome(r.sub(b));
+        }
       }
 
       IERC20(token).transfer(msg.sender, r);
 
-      rebalance();
+      if (newProvider != provider) {
+        _rebalance(newProvider);
+      }
       pool = calcPoolValueInToken();
   }
 }
