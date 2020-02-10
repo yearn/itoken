@@ -509,17 +509,20 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     uint256 b = balanceCompound();
     uint256 bT = balanceCompoundInToken();
     require(bT >= _amount, "insufficient funds");
-    uint256 amount = b.mul(_amount).div(bT);
+    // can have unintentional rounding errors
+    uint256 amount = (b.mul(_amount)).div(bT).add(1);
     _withdrawCompound(amount);
   }
 
+  // 1999999614570950845
   function _withdrawSomeFulcrum(uint256 _amount) internal {
     // Balance of fulcrum tokens, 1 iDAI = 1.00x DAI
-    uint256 b = balanceFulcrum();
+    uint256 b = balanceFulcrum(); // 1970469086655766652
     // Balance of token in fulcrum
-    uint256 bT = balanceFulcrumInToken();
+    uint256 bT = balanceFulcrumInToken(); // 2000000803224344406
     require(bT >= _amount, "insufficient funds");
-    uint256 amount = b.mul(_amount).div(bT);
+    // can have unintentional rounding errors
+    uint256 amount = (b.mul(_amount)).div(bT).add(1);
     _withdrawFulcrum(amount);
   }
 
