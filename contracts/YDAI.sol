@@ -456,7 +456,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
   function approveToken() public {
       IERC20(token).approve(compound, uint(-1)); //also add to constructor
       IERC20(token).approve(dydx, uint(-1));
-      IERC20(token).approve(getAave(), uint(-1));
       IERC20(token).approve(getAaveCore(), uint(-1));
       IERC20(token).approve(fulcrum, uint(-1));
   }
