@@ -658,7 +658,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       // Check ETH balance
       uint256 b = IERC20(token).balanceOf(address(this));
       if (b < r) {
-        _withdrawSome(r);
+        _withdrawSome(r.sub(b));
       }
 
       IERC20(token).transfer(msg.sender, r);
@@ -689,7 +689,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       // Check ETH balance
       uint256 b = IERC20(token).balanceOf(address(this));
       if (b < r) {
-        _withdrawSome(r);
+        _withdrawSome(r.sub(b));
       }
 
       IERC20(token).transfer(msg.sender, r);
