@@ -513,6 +513,16 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     _withdrawCompound(amount);
   }
 
+  function _withdrawSomeFulcrum(uint256 _amount) internal {
+    // Balance of fulcrum tokens, 1 iDAI = 1.00x DAI
+    uint256 b = balanceFulcrum();
+    // Balance of token in fulcrum
+    uint256 bT = balanceFulcrumInToken();
+    require(bT >= _amount, "insufficient funds");
+    uint256 amount = b.mul(_amount).div(bT);
+    _withdrawFulcrum(amount);
+  }
+
   function _withdrawSome(uint256 _amount) internal {
     if (provider == Lender.COMPOUND) {
       _withdrawSomeCompound(_amount);
@@ -526,7 +536,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       _withdrawDydx(_amount);
     }
     if (provider == Lender.FULCRUM) {
-      _withdrawFulcrum(_amount);
+      _withdrawSomeFulcrum(_amount);
     }
   }
 
@@ -657,7 +667,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
 
       // Could have over value from cTokens
       pool = calcPoolValueInToken();
-      // Calc eth to redeem before updating balances
+      // Calc to redeem before updating balances
       uint256 r = (pool.mul(_shares)).div(_totalSupply);
 
 
@@ -666,7 +676,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
 
       emit Transfer(msg.sender, address(0), _shares);
 
-      // Check ETH balance
+      // Check balance
       uint256 b = IERC20(token).balanceOf(address(this));
       if (b < r) {
         _withdrawSome(r.sub(b));
@@ -688,7 +698,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
 
       // Could have over value from cTokens
       pool = calcPoolValueInToken();
-      // Calc eth to redeem before updating balances
+      // Calc to redeem before updating balances
       uint256 r = (pool.mul(_shares)).div(_totalSupply);
 
 
