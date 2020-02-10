@@ -135,38 +135,6 @@ contract ReentrancyGuard {
     }
 }
 
-contract Ownable is Context {
-    address private _owner;
-
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    constructor () internal {
-        _owner = _msgSender();
-        emit OwnershipTransferred(address(0), _owner);
-    }
-    function owner() public view returns (address) {
-        return _owner;
-    }
-    modifier onlyOwner() {
-        require(isOwner(), "Ownable: caller is not the owner");
-        _;
-    }
-    function isOwner() public view returns (bool) {
-        return _msgSender() == _owner;
-    }
-    function renounceOwnership() public onlyOwner {
-        emit OwnershipTransferred(_owner, address(0));
-        _owner = address(0);
-    }
-    function transferOwnership(address newOwner) public onlyOwner {
-        _transferOwnership(newOwner);
-    }
-    function _transferOwnership(address newOwner) internal {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        emit OwnershipTransferred(_owner, newOwner);
-        _owner = newOwner;
-    }
-}
-
 library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
@@ -365,7 +333,7 @@ interface LendingPoolAddressesProvider {
     function getLendingPoolCore() external view returns (address);
 }
 
-contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
+contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
   using SafeERC20 for IERC20;
   using Address for address;
   using SafeMath for uint256;
@@ -400,27 +368,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     compound = address(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
     dToken = 3;
     approveToken();
-  }
-  function set_new_AAVE(address _new_AAVE) public onlyOwner {
-      aave = _new_AAVE;
-  }
-  function set_new_DYDX(address _new_DYDX) public onlyOwner {
-      dydx = _new_DYDX;
-  }
-  function set_new_APR(address _new_APR) public onlyOwner {
-      apr = _new_APR;
-  }
-  function set_new_FULCRUM(address _new_FULCRUM) public onlyOwner {
-      fulcrum = _new_FULCRUM;
-  }
-  function set_new_ATOKEN(address _new_ATOKEN) public onlyOwner {
-      aaveToken = _new_ATOKEN;
-  }
-  function set_new_COMPOUND(address _new_COMPOUND) public onlyOwner {
-      compound = _new_COMPOUND;
-  }
-  function set_new_DTOKEN(uint256 _new_DTOKEN) public onlyOwner {
-      dToken = _new_DTOKEN;
   }
 
   function() external payable {
@@ -654,18 +601,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       _mint(msg.sender, shares);
   }
 
-  // Invest self eth from external profits
-  function investSelf()
-      external
-      nonReentrant
-      onlyOwner
-  {
-      uint b = IERC20(token).balanceOf(address(this));
-      require(b > 0, "deposit must be greater than 0");
-      rebalance();
-      pool = calcPoolValueInToken();
-  }
-
   function calcPoolValueInToken() public view returns (uint) {
 
     return balanceCompoundInToken()
@@ -711,17 +646,5 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
 
       rebalance();
       pool = calcPoolValueInToken();
-
-  }
-
-  // incase of half-way error
-  function inCaseTokenGetsStuck(IERC20 _TokenAddress) onlyOwner public {
-      uint qty = _TokenAddress.balanceOf(address(this));
-      _TokenAddress.transfer(msg.sender, qty);
-  }
-  // incase of half-way error
-  function inCaseETHGetsStuck() onlyOwner public{
-      (bool result, ) = msg.sender.call.value(address(this).balance)("");
-      require(result, "transfer of ETH failed");
   }
 }
