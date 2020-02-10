@@ -424,7 +424,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       DyDx(dydx).operate(infos, args);
   }
 
-  function withdrawDydx(uint256 amount) internal {
+  function _withdrawDydx(uint256 amount) internal {
       Info[] memory infos = new Info[](1);
       infos[0] = Info(address(this), 0);
 
@@ -490,47 +490,47 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     return IERC20(aaveToken).balanceOf(address(this));
   }
 
-  function withdrawAll() internal {
+  function _withdrawAll() internal {
     uint256 amount = balanceCompound();
     if (amount > 0) {
-      withdrawCompound(amount);
+      _withdrawCompound(amount);
     }
     amount = balanceDydx();
     if (amount > 0) {
-      withdrawDydx(amount);
+      _withdrawDydx(amount);
     }
     amount = balanceFulcrum();
     if (amount > 0) {
-      withdrawFulcrum(amount);
+      _withdrawFulcrum(amount);
     }
     amount = balanceAave();
     if (amount > 0) {
-      withdrawAave(amount);
+      _withdrawAave(amount);
     }
   }
 
-  function withdrawSomeCompound(uint256 _amount) internal {
+  function _withdrawSomeCompound(uint256 _amount) internal {
     uint256 b = balanceCompound();
     uint256 bT = balanceCompoundInToken();
     require(bT >= _amount, "insufficient funds");
     uint256 amount = b.mul(_amount).div(bT);
-    withdrawCompound(amount);
+    _withdrawCompound(amount);
   }
 
-  function withdrawSome(uint256 _amount) internal {
+  function _withdrawSome(uint256 _amount) internal {
     if (provider == Lender.COMPOUND) {
-      withdrawSomeCompound(_amount);
+      _withdrawSomeCompound(_amount);
     }
     if (provider == Lender.AAVE) {
       require(balanceAave() >= _amount, "insufficient funds");
-      withdrawAave(_amount);
+      _withdrawAave(_amount);
     }
     if (provider == Lender.DYDX) {
       require(balanceDydx() >= _amount, "insufficient funds");
-      withdrawDydx(_amount);
+      _withdrawDydx(_amount);
     }
     if (provider == Lender.FULCRUM) {
-      withdrawFulcrum(_amount);
+      _withdrawFulcrum(_amount);
     }
   }
 
@@ -538,7 +538,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     Lender newProvider = recommend();
 
     if (newProvider != provider) {
-      withdrawAll();
+      _withdrawAll();
     }
 
     if (balance() > 0) {
@@ -567,13 +567,13 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
   function supplyCompound(uint amount) public {
       require(Compound(compound).mint(amount) == 0, "COMPOUND: supply failed");
   }
-  function withdrawAave(uint amount) internal {
+  function _withdrawAave(uint amount) internal {
       AToken(aaveToken).redeem(amount);
   }
-  function withdrawFulcrum(uint amount) internal {
+  function _withdrawFulcrum(uint amount) internal {
       require(Fulcrum(fulcrum).burn(address(this), amount) > 0, "FULCRUM: withdraw failed");
   }
-  function withdrawCompound(uint amount) internal {
+  function _withdrawCompound(uint amount) internal {
       require(Compound(compound).redeem(amount) == 0, "COMPOUND: withdraw failed");
   }
 
@@ -659,7 +659,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       // Check ETH balance
       uint256 b = IERC20(token).balanceOf(address(this));
       if (b < r) {
-        withdrawSome(r);
+        _withdrawSome(r);
       }
 
       IERC20(token).transfer(msg.sender, r);
@@ -690,7 +690,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       // Check ETH balance
       uint256 b = IERC20(token).balanceOf(address(this));
       if (b < r) {
-        withdrawSome(r);
+        _withdrawSome(r);
       }
 
       IERC20(token).transfer(msg.sender, r);
