@@ -577,7 +577,28 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       require(Compound(compound).redeem(amount) == 0, "COMPOUND: withdraw failed");
   }
 
-  // Invest ETH
+  // Quick swap low gas method for pool swaps
+  function deposit(uint256 _amount)
+      external
+      nonReentrant
+  {
+      require(_amount > 0, "deposit must be greater than 0");
+      pool = calcPoolValueInToken();
+
+      IERC20(token).transferFrom(msg.sender, address(this), _amount);
+
+      // Calculate pool shares
+      uint256 shares = 0;
+      if (pool == 0) {
+        shares = _amount;
+        pool = _amount;
+      } else {
+        shares = (_amount.mul(_totalSupply)).div(pool);
+      }
+      pool = calcPoolValueInToken();
+      _mint(msg.sender, shares);
+  }
+
   function invest(uint256 _amount)
       external
       nonReentrant
@@ -602,7 +623,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
   }
 
   function calcPoolValueInToken() public view returns (uint) {
-
     return balanceCompoundInToken()
       .add(balanceFulcrumInToken())
       .add(balanceDydx())
@@ -613,6 +633,37 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
   function getPricePerFullShare() public view returns (uint) {
     uint _pool = calcPoolValueInToken();
     return _pool.mul(1e18).div(_totalSupply);
+  }
+
+  // No rebalance implementation for lower fees and faster swaps
+  function withdraw(uint256 _shares)
+      external
+      nonReentrant
+  {
+      require(_shares > 0, "withdraw must be greater than 0");
+
+      uint256 ibalance = balanceOf(msg.sender);
+      require(_shares <= ibalance, "insufficient balance");
+
+      // Could have over value from cTokens
+      pool = calcPoolValueInToken();
+      // Calc eth to redeem before updating balances
+      uint256 r = (pool.mul(_shares)).div(_totalSupply);
+
+
+      _balances[msg.sender] = _balances[msg.sender].sub(_shares, "redeem amount exceeds balance");
+      _totalSupply = _totalSupply.sub(_shares);
+
+      emit Transfer(msg.sender, address(0), _shares);
+
+      // Check ETH balance
+      uint256 b = IERC20(token).balanceOf(address(this));
+      if (b < r) {
+        withdrawSome(r);
+      }
+
+      IERC20(token).transfer(msg.sender, r);
+      pool = calcPoolValueInToken();
   }
 
   // Redeem any invested tokens from the pool
