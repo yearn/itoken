@@ -376,7 +376,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       nonReentrant
   {
       require(_amount > 0, "deposit must be greater than 0");
-      pool = calcPoolValueInToken();
+      pool = _calcPoolValueInToken();
 
       IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
 
@@ -388,7 +388,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       } else {
         shares = (_amount.mul(_totalSupply)).div(pool);
       }
-      pool = calcPoolValueInToken();
+      pool = _calcPoolValueInToken();
       _mint(msg.sender, shares);
   }
 
@@ -403,7 +403,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       require(_shares <= ibalance, "insufficient balance");
 
       // Could have over value from cTokens
-      pool = calcPoolValueInToken();
+      pool = _calcPoolValueInToken();
       // Calc to redeem before updating balances
       uint256 r = (pool.mul(_shares)).div(_totalSupply);
 
@@ -420,7 +420,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       }
 
       IERC20(token).transfer(msg.sender, r);
-      pool = calcPoolValueInToken();
+      pool = _calcPoolValueInToken();
   }
 
   function() external payable {
@@ -492,10 +492,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       DyDx(dydx).operate(infos, args);
   }
 
-  function balance() public view returns (uint256) {
-    return IERC20(token).balanceOf(address(this));
-  }
-
   function getAave() public view returns (address) {
     return LendingPoolAddressesProvider(aave).getLendingPool();
   }
@@ -508,6 +504,10 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       IERC20(token).safeApprove(dydx, uint(-1));
       IERC20(token).safeApprove(getAaveCore(), uint(-1));
       IERC20(token).safeApprove(fulcrum, uint(-1));
+  }
+
+  function balance() public view returns (uint256) {
+    return IERC20(token).balanceOf(address(this));
   }
 
   function balanceDydx() public view returns (uint256) {
@@ -539,20 +539,53 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     return IERC20(aaveToken).balanceOf(address(this));
   }
 
+  function _balance() internal view returns (uint256) {
+    return IERC20(token).balanceOf(address(this));
+  }
+
+  function _balanceDydx() internal view returns (uint256) {
+      Wei memory bal = DyDx(dydx).getAccountWei(Info(address(this), 0), dToken);
+      return bal.value;
+  }
+  function _balanceCompound() internal view returns (uint256) {
+      return IERC20(compound).balanceOf(address(this));
+  }
+  function _balanceCompoundInToken() internal view returns (uint256) {
+    // Mantisa 1e18 to decimals
+    uint256 b = balanceCompound();
+    if (b > 0) {
+      b = b.mul(Compound(compound).exchangeRateStored()).div(1e18);
+    }
+    return b;
+  }
+  function _balanceFulcrumInToken() internal view returns (uint256) {
+    uint256 b = balanceFulcrum();
+    if (b > 0) {
+      b = Fulcrum(fulcrum).assetBalanceOf(address(this));
+    }
+    return b;
+  }
+  function _balanceFulcrum() internal view returns (uint256) {
+    return IERC20(fulcrum).balanceOf(address(this));
+  }
+  function _balanceAave() internal view returns (uint256) {
+    return IERC20(aaveToken).balanceOf(address(this));
+  }
+
   function _withdrawAll() internal {
-    uint256 amount = balanceCompound();
+    uint256 amount = _balanceCompound();
     if (amount > 0) {
       _withdrawCompound(amount);
     }
-    amount = balanceDydx();
+    amount = _balanceDydx();
     if (amount > 0) {
       _withdrawDydx(amount);
     }
-    amount = balanceFulcrum();
+    amount = _balanceFulcrum();
     if (amount > 0) {
       _withdrawFulcrum(amount);
     }
-    amount = balanceAave();
+    amount = _balanceAave();
     if (amount > 0) {
       _withdrawAave(amount);
     }
@@ -620,15 +653,15 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
 
   // Internal only rebalance for better gas in redeem
   function _rebalance(Lender newProvider) internal {
-    if (balance() > 0) {
+    if (_balance() > 0) {
       if (newProvider == Lender.DYDX) {
-        supplyDydx(balance());
+        supplyDydx(_balance());
       } else if (newProvider == Lender.FULCRUM) {
-        supplyFulcrum(balance());
+        supplyFulcrum(_balance());
       } else if (newProvider == Lender.COMPOUND) {
-        supplyCompound(balance());
+        supplyCompound(_balance());
       } else if (newProvider == Lender.AAVE) {
-        supplyAave(balance());
+        supplyAave(_balance());
       }
     }
     provider = newProvider;
@@ -674,6 +707,14 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       }
       pool = calcPoolValueInToken();
       _mint(msg.sender, shares);
+  }
+
+  function _calcPoolValueInToken() internal view returns (uint) {
+    return _balanceCompoundInToken()
+      .add(_balanceFulcrumInToken())
+      .add(_balanceDydx())
+      .add(_balanceAave())
+      .add(_balance());
   }
 
   function calcPoolValueInToken() public view returns (uint) {
