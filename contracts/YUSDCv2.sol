@@ -419,7 +419,7 @@ contract yUSDC is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
         _withdrawSome(r.sub(b));
       }
 
-      IERC20(token).transfer(msg.sender, r);
+      IERC20(token).safeTransfer(msg.sender, r);
       pool = _calcPoolValueInToken();
   }
 

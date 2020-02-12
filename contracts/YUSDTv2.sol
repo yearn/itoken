@@ -465,7 +465,7 @@ contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
         _withdrawSome(r.sub(b));
       }
 
-      IERC20(token).transfer(msg.sender, r);
+      IERC20(token).safeTransfer(msg.sender, r);
       pool = _calcPoolValueInToken();
   }
 
@@ -732,29 +732,6 @@ contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
       require(Compound(compound).redeem(amount) == 0, "COMPOUND: withdraw failed");
   }
 
-  function invest(uint256 _amount)
-      external
-      nonReentrant
-  {
-      require(_amount > 0, "deposit must be greater than 0");
-      pool = calcPoolValueInToken();
-
-      IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
-
-      rebalance();
-
-      // Calculate pool shares
-      uint256 shares = 0;
-      if (pool == 0) {
-        shares = _amount;
-        pool = _amount;
-      } else {
-        shares = (_amount.mul(_totalSupply)).div(pool);
-      }
-      pool = calcPoolValueInToken();
-      _mint(msg.sender, shares);
-  }
-
   function _calcPoolValueInToken() internal view returns (uint) {
     return _balanceCompoundInToken()
       .add(_balanceFulcrumInToken())
@@ -774,46 +751,5 @@ contract yUSDT is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
   function getPricePerFullShare() public view returns (uint) {
     uint _pool = calcPoolValueInToken();
     return _pool.mul(1e18).div(_totalSupply);
-  }
-
-  // Redeem any invested tokens from the pool
-  function redeem(uint256 _shares)
-      external
-      nonReentrant
-  {
-      require(_shares > 0, "withdraw must be greater than 0");
-
-      uint256 ibalance = balanceOf(msg.sender);
-      require(_shares <= ibalance, "insufficient balance");
-
-      // Could have over value from cTokens
-      pool = calcPoolValueInToken();
-      // Calc to redeem before updating balances
-      uint256 r = (pool.mul(_shares)).div(_totalSupply);
-
-
-      _balances[msg.sender] = _balances[msg.sender].sub(_shares, "redeem amount exceeds balance");
-      _totalSupply = _totalSupply.sub(_shares);
-
-      emit Transfer(msg.sender, address(0), _shares);
-
-      // Check ETH balance
-      uint256 b = IERC20(token).balanceOf(address(this));
-      Lender newProvider = provider;
-      if (b < r) {
-        newProvider = recommend();
-        if (newProvider != provider) {
-          _withdrawAll();
-        } else {
-          _withdrawSome(r.sub(b));
-        }
-      }
-
-      IERC20(token).safeTransfer(msg.sender, r);
-
-      if (newProvider != provider) {
-        _rebalance(newProvider);
-      }
-      pool = calcPoolValueInToken();
   }
 }
