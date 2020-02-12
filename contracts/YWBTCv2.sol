@@ -365,7 +365,7 @@ interface LendingPoolAddressesProvider {
     function getLendingPoolCore() external view returns (address);
 }
 
-contract yTUSD is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
+contract yWBTC is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
   using SafeERC20 for IERC20;
   using Address for address;
   using SafeMath for uint256;
@@ -390,14 +390,14 @@ contract yTUSD is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
 
   Lender public provider = Lender.NONE;
 
-  constructor () public ERC20Detailed("iearn TUSD", "yTUSD", 18) {
-    token = address(0x0000000000085d4780B73119b644AE5ecd22b376);
+  constructor () public ERC20Detailed("iearn wBTC", "yWTBC", 8) {
+    token = address(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599);
     apr = address(0xdD6d648C991f7d47454354f4Ef326b04025a48A8);
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
     aave = address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
-    fulcrum = address(0x49f4592E641820e928F9919Ef4aBd92a719B4b49);
-    aaveToken = address(0x4DA9b813057D04BAef4e5800E36083717b4a0341);
-    compound = address(0x39AA39c021dfbaE8faC545936693aC917d5E7563);
+    fulcrum = address(0xBA9262578EFef8b3aFf7F60Cd629d6CC8859C8b5);
+    aaveToken = address(0xFC4B8ED459e00e5400be803A9BB3954234FD50e3);
+    compound = address(0xC11b1268C1A384e55C48c2391d8d480264A3A7F4);
     dToken = 0;
     approveToken();
   }
