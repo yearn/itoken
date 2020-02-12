@@ -358,7 +358,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
 
   Lender public provider = Lender.NONE;
 
-  constructor () public ERC20Detailed("Yield DAI", "yDAI", 18) {
+  constructor () public ERC20Detailed("iearn DAI", "yDAI", 18) {
     token = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     apr = address(0xdD6d648C991f7d47454354f4Ef326b04025a48A8);
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
@@ -368,6 +368,59 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     compound = address(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
     dToken = 3;
     approveToken();
+  }
+
+  // Quick swap low gas method for pool swaps
+  function deposit(uint256 _amount)
+      external
+      nonReentrant
+  {
+      require(_amount > 0, "deposit must be greater than 0");
+      pool = calcPoolValueInToken();
+
+      IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
+
+      // Calculate pool shares
+      uint256 shares = 0;
+      if (pool == 0) {
+        shares = _amount;
+        pool = _amount;
+      } else {
+        shares = (_amount.mul(_totalSupply)).div(pool);
+      }
+      pool = calcPoolValueInToken();
+      _mint(msg.sender, shares);
+  }
+
+  // No rebalance implementation for lower fees and faster swaps
+  function withdraw(uint256 _shares)
+      external
+      nonReentrant
+  {
+      require(_shares > 0, "withdraw must be greater than 0");
+
+      uint256 ibalance = balanceOf(msg.sender);
+      require(_shares <= ibalance, "insufficient balance");
+
+      // Could have over value from cTokens
+      pool = calcPoolValueInToken();
+      // Calc to redeem before updating balances
+      uint256 r = (pool.mul(_shares)).div(_totalSupply);
+
+
+      _balances[msg.sender] = _balances[msg.sender].sub(_shares, "redeem amount exceeds balance");
+      _totalSupply = _totalSupply.sub(_shares);
+
+      emit Transfer(msg.sender, address(0), _shares);
+
+      // Check balance
+      uint256 b = IERC20(token).balanceOf(address(this));
+      if (b < r) {
+        _withdrawSome(r.sub(b));
+      }
+
+      IERC20(token).transfer(msg.sender, r);
+      pool = calcPoolValueInToken();
   }
 
   function() external payable {
@@ -451,10 +504,10 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
   }
 
   function approveToken() public {
-      IERC20(token).approve(compound, uint(-1)); //also add to constructor
-      IERC20(token).approve(dydx, uint(-1));
-      IERC20(token).approve(getAaveCore(), uint(-1));
-      IERC20(token).approve(fulcrum, uint(-1));
+      IERC20(token).safeApprove(compound, uint(-1)); //also add to constructor
+      IERC20(token).safeApprove(dydx, uint(-1));
+      IERC20(token).safeApprove(getAaveCore(), uint(-1));
+      IERC20(token).safeApprove(fulcrum, uint(-1));
   }
 
   function balanceDydx() public view returns (uint256) {
@@ -600,28 +653,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       require(Compound(compound).redeem(amount) == 0, "COMPOUND: withdraw failed");
   }
 
-  // Quick swap low gas method for pool swaps
-  function deposit(uint256 _amount)
-      external
-      nonReentrant
-  {
-      require(_amount > 0, "deposit must be greater than 0");
-      pool = calcPoolValueInToken();
-
-      IERC20(token).transferFrom(msg.sender, address(this), _amount);
-
-      // Calculate pool shares
-      uint256 shares = 0;
-      if (pool == 0) {
-        shares = _amount;
-        pool = _amount;
-      } else {
-        shares = (_amount.mul(_totalSupply)).div(pool);
-      }
-      pool = calcPoolValueInToken();
-      _mint(msg.sender, shares);
-  }
-
   function invest(uint256 _amount)
       external
       nonReentrant
@@ -629,7 +660,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
       require(_amount > 0, "deposit must be greater than 0");
       pool = calcPoolValueInToken();
 
-      IERC20(token).transferFrom(msg.sender, address(this), _amount);
+      IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
 
       rebalance();
 
@@ -656,37 +687,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
   function getPricePerFullShare() public view returns (uint) {
     uint _pool = calcPoolValueInToken();
     return _pool.mul(1e18).div(_totalSupply);
-  }
-
-  // No rebalance implementation for lower fees and faster swaps
-  function withdraw(uint256 _shares)
-      external
-      nonReentrant
-  {
-      require(_shares > 0, "withdraw must be greater than 0");
-
-      uint256 ibalance = balanceOf(msg.sender);
-      require(_shares <= ibalance, "insufficient balance");
-
-      // Could have over value from cTokens
-      pool = calcPoolValueInToken();
-      // Calc to redeem before updating balances
-      uint256 r = (pool.mul(_shares)).div(_totalSupply);
-
-
-      _balances[msg.sender] = _balances[msg.sender].sub(_shares, "redeem amount exceeds balance");
-      _totalSupply = _totalSupply.sub(_shares);
-
-      emit Transfer(msg.sender, address(0), _shares);
-
-      // Check balance
-      uint256 b = IERC20(token).balanceOf(address(this));
-      if (b < r) {
-        _withdrawSome(r.sub(b));
-      }
-
-      IERC20(token).transfer(msg.sender, r);
-      pool = calcPoolValueInToken();
   }
 
   // Redeem any invested tokens from the pool
@@ -722,7 +722,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
         }
       }
 
-      IERC20(token).transfer(msg.sender, r);
+      IERC20(token).safeTransfer(msg.sender, r);
 
       if (newProvider != provider) {
         _rebalance(newProvider);
