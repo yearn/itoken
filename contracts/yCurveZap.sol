@@ -301,7 +301,7 @@ contract yCurveZap is ReentrancyGuard, Ownable {
   {
       require(_amount > 0, "deposit must be greater than 0");
       IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-      ICurveFi(SWAP).remove_liquidity_imbalance([IERC20(CURVE).balanceOf(address(this)),0,0,0],0);
+      ICurveFi(SWAP).remove_liquidity_imbalance([IERC20(CURVE).balanceOf(address(this)),0,0,0],uint256(-1));
       require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
       IERC20(yDAI).safeTransfer(msg.sender, IERC20(yDAI).balanceOf(address(this)));
       require(IERC20(yDAI).balanceOf(address(this)) == 0, "yToken remainder");
@@ -313,7 +313,7 @@ contract yCurveZap is ReentrancyGuard, Ownable {
   {
       require(_amount > 0, "deposit must be greater than 0");
       IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-      ICurveFi(SWAP).remove_liquidity_imbalance([0,IERC20(CURVE).balanceOf(address(this)),0,0],0);
+      ICurveFi(SWAP).remove_liquidity_imbalance([0,IERC20(CURVE).balanceOf(address(this)),0,0],uint256(-1));
       require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
       IERC20(yUSDC).safeTransfer(msg.sender, IERC20(yUSDC).balanceOf(address(this)));
       require(IERC20(yUSDC).balanceOf(address(this)) == 0, "yToken remainder");
@@ -325,7 +325,7 @@ contract yCurveZap is ReentrancyGuard, Ownable {
   {
       require(_amount > 0, "deposit must be greater than 0");
       IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-      ICurveFi(SWAP).remove_liquidity_imbalance([0,0,IERC20(CURVE).balanceOf(address(this)),0],0);
+      ICurveFi(SWAP).remove_liquidity_imbalance([0,0,IERC20(CURVE).balanceOf(address(this)),0],uint256(-1));
       require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
       IERC20(yUSDT).safeTransfer(msg.sender, IERC20(yUSDT).balanceOf(address(this)));
       require(IERC20(yUSDT).balanceOf(address(this)) == 0, "yToken remainder");
@@ -337,7 +337,7 @@ contract yCurveZap is ReentrancyGuard, Ownable {
   {
       require(_amount > 0, "deposit must be greater than 0");
       IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-      ICurveFi(SWAP).remove_liquidity_imbalance([0,0,0,IERC20(CURVE).balanceOf(address(this))],0);
+      ICurveFi(SWAP).remove_liquidity_imbalance([0,0,0,IERC20(CURVE).balanceOf(address(this))],uint256(-1));
       require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
       IERC20(yTUSD).safeTransfer(msg.sender, IERC20(yUSDT).balanceOf(address(this)));
       require(IERC20(yTUSD).balanceOf(address(this)) == 0, "yToken remainder");
