@@ -400,7 +400,7 @@ contract yWBTC is ERC20, ERC20Detailed, ReentrancyGuard, Ownable, Structs {
     compound = address(0xC11b1268C1A384e55C48c2391d8d480264A3A7F4);
     dToken = 0;
     approveToken();
-  }
+  } 
 
   // Ownable setters incase of support in future for these systems
   function set_new_APR(address _new_APR) public onlyOwner {
