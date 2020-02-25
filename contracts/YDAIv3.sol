@@ -375,6 +375,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   address public compound;
   address public fulcrum;
   address public aave;
+  address public aavePool;
   address public aaveToken;
   address public dydx;
   uint256 public dToken;
@@ -395,6 +396,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
     apr = address(0xdD6d648C991f7d47454354f4Ef326b04025a48A8);
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
     aave = address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
+    aavePool = address(0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3);
     fulcrum = address(0x493C57C4763932315A328269E1ADaD09653B9081);
     aaveToken = address(0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d);
     compound = address(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
@@ -416,6 +418,9 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   }
   function set_new_AAVE(address _new_AAVE) public onlyOwner {
       aave = _new_AAVE;
+  }
+  function set_new_APOOL(address _new_APOOL) public onlyOwner {
+      aavePool = _new_APOOL;
   }
   function set_new_ATOKEN(address _new_ATOKEN) public onlyOwner {
       aaveToken = _new_ATOKEN;
@@ -520,10 +525,15 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   function balance() public view returns (uint256) {
     return IERC20(token).balanceOf(address(this));
   }
-
+  function balanceDydxAvailable() public view returns (uint256) {
+      return IERC20(token).balanceOf(dydx);
+  }
   function balanceDydx() public view returns (uint256) {
       Wei memory bal = DyDx(dydx).getAccountWei(Info(address(this), 0), dToken);
       return bal.value;
+  }
+  function balanceCompoundAvailable() public view returns (uint256) {
+      return IERC20(token).balanceOf(compound);
   }
   function balanceCompound() public view returns (uint256) {
       return IERC20(compound).balanceOf(address(this));
@@ -536,6 +546,9 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
     }
     return b;
   }
+  function balanceFulcrumAvailable() public view returns (uint256) {
+      return IERC20(token).balanceOf(fulcrum);
+  }
   function balanceFulcrumInToken() public view returns (uint256) {
     uint256 b = balanceFulcrum();
     if (b > 0) {
@@ -545,6 +558,9 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   }
   function balanceFulcrum() public view returns (uint256) {
     return IERC20(fulcrum).balanceOf(address(this));
+  }
+  function balanceAaveAvailable() public view returns (uint256) {
+      return IERC20(token).balanceOf(aavePool);
   }
   function balanceAave() public view returns (uint256) {
     return IERC20(aaveToken).balanceOf(address(this));
@@ -575,19 +591,19 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   function _withdrawAll() internal {
     uint256 amount = balanceCompound();
     if (amount > 0) {
-      _withdrawCompound(amount);
+      _withdrawCompound(balanceCompoundAvailable());
     }
     amount = balanceDydx();
     if (amount > 0) {
-      _withdrawDydx(amount);
+      _withdrawDydx(balanceDydxAvailable());
     }
     amount = balanceFulcrum();
     if (amount > 0) {
-      _withdrawFulcrum(amount);
+      _withdrawFulcrum(balanceFulcrumAvailable());
     }
     amount = balanceAave();
     if (amount > 0) {
-      _withdrawAave(amount);
+      _withdrawAave(balanceAaveAvailable());
     }
   }
 
