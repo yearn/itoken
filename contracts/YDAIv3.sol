@@ -591,7 +591,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   function _withdrawAll() internal {
     uint256 amount = balanceCompound();
     if (amount > 0) {
-      _withdrawCompound(balanceCompoundAvailable());
+      _withdrawSomeCompound(balanceCompoundAvailable().sub(1));
     }
     amount = balanceDydx();
     if (amount > 0) {
@@ -599,7 +599,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
     }
     amount = balanceFulcrum();
     if (amount > 0) {
-      _withdrawFulcrum(balanceFulcrumAvailable());
+      _withdrawSomeFulcrum(balanceFulcrumAvailable().sub(1));
     }
     amount = balanceAave();
     if (amount > 0) {
