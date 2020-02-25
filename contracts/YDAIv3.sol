@@ -516,7 +516,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   }
 
   function approveToken() public {
-      IERC20(token).safeApprove(compound, uint(-1)); //also add to constructor
+      IERC20(token).safeApprove(compound, uint(-1));
       IERC20(token).safeApprove(dydx, uint(-1));
       IERC20(token).safeApprove(getAaveCore(), uint(-1));
       IERC20(token).safeApprove(fulcrum, uint(-1));
@@ -616,12 +616,9 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
     _withdrawCompound(amount);
   }
 
-  // 1999999614570950845
   function _withdrawSomeFulcrum(uint256 _amount) internal {
-    // Balance of fulcrum tokens, 1 iDAI = 1.00x DAI
-    uint256 b = balanceFulcrum(); // 1970469086655766652
-    // Balance of token in fulcrum
-    uint256 bT = balanceFulcrumInToken(); // 2000000803224344406
+    uint256 b = balanceFulcrum();
+    uint256 bT = balanceFulcrumInToken();
     require(bT >= _amount, "insufficient funds");
     // can have unintentional rounding errors
     uint256 amount = (b.mul(_amount)).div(bT).add(1);
@@ -713,26 +710,22 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
     return _pool.mul(1e18).div(_totalSupply);
   }
 
-  function withdrawAll() public onlyOwner {
-    _withdrawAll();
-  }
-
   function withdrawSomeCompound(uint256 _amount) public onlyOwner {
     _withdrawSomeCompound(_amount);
   }
-
   function withdrawSomeFulcrum(uint256 _amount) public onlyOwner {
     _withdrawSomeFulcrum(_amount);
   }
-
-  function withdrawSome(uint256 _amount) public onlyOwner {
-    _withdrawSome(_amount);
+  function withdrawAave(uint amount) public onlyOwner {
+      _withdrawAave(amount);
+  }
+  function withdrawDydx(uint256 amount) public onlyOwner {
+      _withdrawDydx(amount);
   }
 
   function supplyDydx(uint256 amount) public onlyOwner {
       _supplyDydx(amount);
   }
-
   function supplyAave(uint amount) public onlyOwner {
     _supplyAave(amount);
   }
@@ -741,18 +734,5 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   }
   function supplyCompound(uint amount) public onlyOwner {
       _supplyCompound(amount);
-  }
-  function withdrawAave(uint amount) public onlyOwner {
-      _withdrawAave(amount);
-  }
-  function withdrawFulcrum(uint amount) public onlyOwner {
-      _withdrawFulcrum(amount);
-  }
-  function withdrawCompound(uint amount) public onlyOwner {
-      _withdrawCompound(amount);
-  }
-
-  function withdrawDydx(uint256 amount) public onlyOwner {
-      _withdrawDydx(amount);
   }
 }
