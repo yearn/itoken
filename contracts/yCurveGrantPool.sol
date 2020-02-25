@@ -185,7 +185,7 @@ interface ICurveFi {
   ) external;
 }
 
-contract yCurveZapOut is ReentrancyGuard, Ownable {
+contract yCurveGrantPool is ReentrancyGuard, Ownable {
   using SafeERC20 for IERC20;
   using Address for address;
   using SafeMath for uint256;
@@ -231,157 +231,30 @@ contract yCurveZapOut is ReentrancyGuard, Ownable {
       IERC20(yTUSD).safeApprove(SWAP, uint(-1));
   }
 
-  // 0 = dai
-  // 1 = usdc
-  // 2 = usdt
-  // 3 = tusd
+  function donate(uint256 _amount) external nonReentrant onlyOwner {
+    ICurveFi(SWAP).remove_liquidity(_amount, [uint256(0),0,0,0]);
 
-  function withdrawDAI(uint256 _amount)
-      external
-      nonReentrant
-  {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
+    uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
+    uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
+    uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
+    uint256 _ytusd = IERC20(yTUSD).balanceOf(address(this));
 
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
-
-      uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
-      uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
-      uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
-      uint256 _ytusd = IERC20(yTUSD).balanceOf(address(this));
-
-      require(_ydai > 0 || _yusdc > 0 || _yusdt > 0 || _ytusd > 0, "no y.tokens found");
-
-      if (_yusdc > 0) {
-        ICurveFi(SWAP).exchange(1, 0, _yusdc, 0);
-        require(IERC20(yUSDC).balanceOf(address(this)) == 0, "y.USDC remainder");
-      }
-      if (_yusdt > 0) {
-        ICurveFi(SWAP).exchange(2, 0, _yusdt, 0);
-        require(IERC20(yUSDT).balanceOf(address(this)) == 0, "y.USDT remainder");
-      }
-      if (_ytusd > 0) {
-        ICurveFi(SWAP).exchange(3, 0, _ytusd, 0);
-        require(IERC20(yTUSD).balanceOf(address(this)) == 0, "y.TUSD remainder");
-      }
-
-      yERC20(yDAI).withdraw(IERC20(yDAI).balanceOf(address(this)));
-      require(IERC20(yDAI).balanceOf(address(this)) == 0, "y.DAI remainder");
-
-      IERC20(DAI).safeTransfer(msg.sender, IERC20(DAI).balanceOf(address(this)));
-      require(IERC20(DAI).balanceOf(address(this)) == 0, "DAI remainder");
-  }
-
-  function withdrawUSDC(uint256 _amount)
-      external
-      nonReentrant
-  {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
-
-      uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
-      uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
-      uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
-      uint256 _ytusd = IERC20(yTUSD).balanceOf(address(this));
-
-      require(_ydai > 0 || _yusdc > 0 || _yusdt > 0 || _ytusd > 0, "no y.tokens found");
-
-      if (_ydai > 0) {
-        ICurveFi(SWAP).exchange(0, 1, _ydai, 0);
-        require(IERC20(yDAI).balanceOf(address(this)) == 0, "y.DAI remainder");
-      }
-      if (_yusdt > 0) {
-        ICurveFi(SWAP).exchange(2, 1, _yusdt, 0);
-        require(IERC20(yUSDT).balanceOf(address(this)) == 0, "y.USDT remainder");
-      }
-      if (_ytusd > 0) {
-        ICurveFi(SWAP).exchange(3, 1, _ytusd, 0);
-        require(IERC20(yTUSD).balanceOf(address(this)) == 0, "y.TUSD remainder");
-      }
-
-      yERC20(yUSDC).withdraw(IERC20(yUSDC).balanceOf(address(this)));
-      require(IERC20(yUSDC).balanceOf(address(this)) == 0, "y.USDC remainder");
-
-      IERC20(USDC).safeTransfer(msg.sender, IERC20(USDC).balanceOf(address(this)));
-      require(IERC20(USDC).balanceOf(address(this)) == 0, "USDC remainder");
-  }
-
-  function withdrawUSDT(uint256 _amount)
-      external
-      nonReentrant
-  {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
-
-      uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
-      uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
-      uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
-      uint256 _ytusd = IERC20(yTUSD).balanceOf(address(this));
-
-      require(_ydai > 0 || _yusdc > 0 || _yusdt > 0 || _ytusd > 0, "no y.tokens found");
-
-      if (_ydai > 0) {
-        ICurveFi(SWAP).exchange(0, 2, _ydai, 0);
-        require(IERC20(yDAI).balanceOf(address(this)) == 0, "y.DAI remainder");
-      }
-      if (_yusdc > 0) {
-        ICurveFi(SWAP).exchange(1, 2, _yusdc, 0);
-        require(IERC20(yUSDC).balanceOf(address(this)) == 0, "y.USDC remainder");
-      }
-      if (_ytusd > 0) {
-        ICurveFi(SWAP).exchange(3, 2, _ytusd, 0);
-        require(IERC20(yTUSD).balanceOf(address(this)) == 0, "y.TUSD remainder");
-      }
-
-      yERC20(yUSDT).withdraw(IERC20(yUSDT).balanceOf(address(this)));
-      require(IERC20(yUSDT).balanceOf(address(this)) == 0, "y.USDT remainder");
-
-      IERC20(USDT).safeTransfer(msg.sender, IERC20(USDT).balanceOf(address(this)));
-      require(IERC20(USDT).balanceOf(address(this)) == 0, "USDT remainder");
-  }
-
-  function withdrawTUSD(uint256 _amount)
-      external
-      nonReentrant
-  {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
-
-      uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
-      uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
-      uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
-      uint256 _ytusd = IERC20(yTUSD).balanceOf(address(this));
-
-      require(_ydai > 0 || _yusdc > 0 || _yusdt > 0 || _ytusd > 0, "no y.tokens found");
-
-      if (_ydai > 0) {
-        ICurveFi(SWAP).exchange(0, 3, _ydai, 0);
-        require(IERC20(yDAI).balanceOf(address(this)) == 0, "y.DAI remainder");
-      }
-      if (_yusdc > 0) {
-        ICurveFi(SWAP).exchange(1, 3, _yusdc, 0);
-        require(IERC20(yUSDC).balanceOf(address(this)) == 0, "y.USDC remainder");
-      }
-      if (_yusdt > 0) {
-        ICurveFi(SWAP).exchange(2, 3, _yusdt, 0);
-        require(IERC20(yUSDT).balanceOf(address(this)) == 0, "y.USDT remainder");
-      }
-
-      yERC20(yTUSD).withdraw(IERC20(yTUSD).balanceOf(address(this)));
-      require(IERC20(yTUSD).balanceOf(address(this)) == 0, "y.TUSD remainder");
-
-      IERC20(TUSD).safeTransfer(msg.sender, IERC20(TUSD).balanceOf(address(this)));
-      require(IERC20(TUSD).balanceOf(address(this)) == 0, "TUSD remainder");
+    if (_ydai > 0) {
+      yERC20(yDAI).withdraw(_ydai);
+      IERC20(DAI).safeTransfer(yDAI, IERC20(DAI).balanceOf(address(this)));
+    }
+    if (_yusdc > 0) {
+      yERC20(yUSDC).withdraw(_yusdc);
+      IERC20(USDC).safeTransfer(yUSDC, IERC20(USDC).balanceOf(address(this)));
+    }
+    if (_yusdt > 0) {
+      yERC20(yUSDT).withdraw(_yusdt);
+      IERC20(USDT).safeTransfer(yUSDT, IERC20(USDT).balanceOf(address(this)));
+    }
+    if (_ytusd > 0) {
+      yERC20(yTUSD).withdraw(_ytusd);
+      IERC20(TUSD).safeTransfer(yTUSD, IERC20(TUSD).balanceOf(address(this)));
+    }
   }
 
   // incase of half-way error
