@@ -380,6 +380,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   address public dydx;
   uint256 public dToken;
   address public apr;
+  address public chai;
 
   enum Lender {
       NONE,
@@ -400,6 +401,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
     fulcrum = address(0x493C57C4763932315A328269E1ADaD09653B9081);
     aaveToken = address(0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d);
     compound = address(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
+    chai = address(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
     dToken = 3;
     approveToken();
   }
@@ -424,6 +426,9 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   }
   function set_new_ATOKEN(address _new_ATOKEN) public onlyOwner {
       aaveToken = _new_ATOKEN;
+  }
+  function set_new_CHAI(address _new_CHAI) public onlyOwner {
+      chai = _new_CHAI;
   }
 
   // Quick swap low gas method for pool swaps
@@ -532,9 +537,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
       Wei memory bal = DyDx(dydx).getAccountWei(Info(address(this), 0), dToken);
       return bal.value;
   }
-  function balanceCompoundAvailable() public view returns (uint256) {
-      return IERC20(token).balanceOf(compound);
-  }
   function balanceCompound() public view returns (uint256) {
       return IERC20(compound).balanceOf(address(this));
   }
@@ -547,7 +549,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
     return b;
   }
   function balanceFulcrumAvailable() public view returns (uint256) {
-      return IERC20(token).balanceOf(fulcrum);
+      return IERC20(chai).balanceOf(fulcrum);
   }
   function balanceFulcrumInToken() public view returns (uint256) {
     uint256 b = balanceFulcrum();
@@ -591,7 +593,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   function _withdrawAll() internal {
     uint256 amount = balanceCompound();
     if (amount > 0) {
-      _withdrawSomeCompound(balanceCompoundAvailable().sub(1));
+      _withdrawSomeCompound(balanceCompoundInToken().sub(1));
     }
     amount = balanceDydx();
     if (amount > 0) {
