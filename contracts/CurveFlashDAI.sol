@@ -234,7 +234,7 @@ contract DyDx is Structs {
 }
 
 
-contract CurveFlash is ReentrancyGuard, Ownable, Structs {
+contract CurveFlashDAI is ReentrancyGuard, Ownable, Structs {
   using SafeERC20 for IERC20;
   using Address for address;
   using SafeMath for uint256;
