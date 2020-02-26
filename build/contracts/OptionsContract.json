@@ -1,11 +1,203 @@
 {
-  "contractName": "Structs",
-  "abi": [],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/oCurveFlashLiquidate.sol\":\"Structs\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/oCurveFlashLiquidate.sol\":{\"keccak256\":\"0xd7454f9c1a4135897321ef455eed51bb59ccb4e62a0f43e515e8dc63d10cfe70\",\"urls\":[\"bzz-raw://5f5055ea5ac9cdbf9df822e8bbf92dcd74da3f1cff952b9cdb63f36b7abc88e0\",\"dweb:/ipfs/QmfBxDJLxLnEhuKxWLPjcj75t1iQNTzSw5kvgw3uHyqcZF\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b50604c80601d6000396000f3fe6080604052600080fdfea365627a7a7231582001616c3ae0d82d1078ef35809249ee7bbf36aa2ec9a83a6f17506f16934c8bae6c6578706572696d656e74616cf564736f6c634300050c0040",
-  "deployedBytecode": "0x6080604052600080fdfea365627a7a7231582001616c3ae0d82d1078ef35809249ee7bbf36aa2ec9a83a6f17506f16934c8bae6c6578706572696d656e74616cf564736f6c634300050c0040",
-  "sourceMap": "7101:1482:25:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;7101:1482:25;;;;;;;",
-  "deployedSourceMap": "7101:1482:25:-;;;;;",
+  "contractName": "OptionsContract",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "vaultOwner",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "oTokensToLiquidate",
+          "type": "uint256"
+        }
+      ],
+      "name": "liquidate",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "vaultOwner",
+          "type": "address"
+        }
+      ],
+      "name": "maxOTokensLiquidatable",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "vaultOwner",
+          "type": "address"
+        }
+      ],
+      "name": "isUnsafe",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "approve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "hasVault",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "maxOTokensIssuable",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokensToMint",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        }
+      ],
+      "name": "addETHCollateralOption",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokensToMint",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver",
+          "type": "address"
+        }
+      ],
+      "name": "createETHCollateralOption",
+      "outputs": [],
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokensToMint\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"}],\"name\":\"addETHCollateralOption\",\"outputs\":[],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokensToMint\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver\",\"type\":\"address\"}],\"name\":\"createETHCollateralOption\",\"outputs\":[],\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"hasVault\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"vaultOwner\",\"type\":\"address\"}],\"name\":\"isUnsafe\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"vaultOwner\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"oTokensToLiquidate\",\"type\":\"uint256\"}],\"name\":\"liquidate\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"maxOTokensIssuable\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"vaultOwner\",\"type\":\"address\"}],\"name\":\"maxOTokensLiquidatable\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/oCurveFlashLiquidate.sol\":\"OptionsContract\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/oCurveFlashLiquidate.sol\":{\"keccak256\":\"0xd7454f9c1a4135897321ef455eed51bb59ccb4e62a0f43e515e8dc63d10cfe70\",\"urls\":[\"bzz-raw://5f5055ea5ac9cdbf9df822e8bbf92dcd74da3f1cff952b9cdb63f36b7abc88e0\",\"dweb:/ipfs/QmfBxDJLxLnEhuKxWLPjcj75t1iQNTzSw5kvgw3uHyqcZF\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.0;\npragma experimental ABIEncoderV2;\n\ninterface IERC20 {\n    function totalSupply() external view returns (uint256);\n    function balanceOf(address account) external view returns (uint256);\n    function transfer(address recipient, uint256 amount) external returns (bool);\n    function allowance(address owner, address spender) external view returns (uint256);\n    function approve(address spender, uint256 amount) external returns (bool);\n    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);\n    event Transfer(address indexed from, address indexed to, uint256 value);\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n}\n\ncontract Context {\n    constructor () internal { }\n    // solhint-disable-previous-line no-empty-blocks\n\n    function _msgSender() internal view returns (address payable) {\n        return msg.sender;\n    }\n\n    function _msgData() internal view returns (bytes memory) {\n        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691\n        return msg.data;\n    }\n}\n\ncontract ReentrancyGuard {\n    uint256 private _guardCounter;\n\n    constructor () internal {\n        _guardCounter = 1;\n    }\n\n    modifier nonReentrant() {\n        _guardCounter += 1;\n        uint256 localCounter = _guardCounter;\n        _;\n        require(localCounter == _guardCounter, \"ReentrancyGuard: reentrant call\");\n    }\n}\n\ncontract Ownable is Context {\n    address private _owner;\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n    constructor () internal {\n        _owner = _msgSender();\n        emit OwnershipTransferred(address(0), _owner);\n    }\n    function owner() public view returns (address) {\n        return _owner;\n    }\n    modifier onlyOwner() {\n        require(isOwner(), \"Ownable: caller is not the owner\");\n        _;\n    }\n    function isOwner() public view returns (bool) {\n        return _msgSender() == _owner;\n    }\n    function renounceOwnership() public onlyOwner {\n        emit OwnershipTransferred(_owner, address(0));\n        _owner = address(0);\n    }\n    function transferOwnership(address newOwner) public onlyOwner {\n        _transferOwnership(newOwner);\n    }\n    function _transferOwnership(address newOwner) internal {\n        require(newOwner != address(0), \"Ownable: new owner is the zero address\");\n        emit OwnershipTransferred(_owner, newOwner);\n        _owner = newOwner;\n    }\n}\n\nlibrary SafeMath {\n    function add(uint256 a, uint256 b) internal pure returns (uint256) {\n        uint256 c = a + b;\n        require(c >= a, \"SafeMath: addition overflow\");\n\n        return c;\n    }\n    function sub(uint256 a, uint256 b) internal pure returns (uint256) {\n        return sub(a, b, \"SafeMath: subtraction overflow\");\n    }\n    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {\n        require(b <= a, errorMessage);\n        uint256 c = a - b;\n\n        return c;\n    }\n    function mul(uint256 a, uint256 b) internal pure returns (uint256) {\n        if (a == 0) {\n            return 0;\n        }\n\n        uint256 c = a * b;\n        require(c / a == b, \"SafeMath: multiplication overflow\");\n\n        return c;\n    }\n    function div(uint256 a, uint256 b) internal pure returns (uint256) {\n        return div(a, b, \"SafeMath: division by zero\");\n    }\n    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {\n        // Solidity only automatically asserts when dividing by 0\n        require(b > 0, errorMessage);\n        uint256 c = a / b;\n\n        return c;\n    }\n    function mod(uint256 a, uint256 b) internal pure returns (uint256) {\n        return mod(a, b, \"SafeMath: modulo by zero\");\n    }\n    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {\n        require(b != 0, errorMessage);\n        return a % b;\n    }\n}\n\nlibrary Address {\n    function isContract(address account) internal view returns (bool) {\n        bytes32 codehash;\n        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;\n        // solhint-disable-next-line no-inline-assembly\n        assembly { codehash := extcodehash(account) }\n        return (codehash != 0x0 && codehash != accountHash);\n    }\n    function toPayable(address account) internal pure returns (address payable) {\n        return address(uint160(account));\n    }\n    function sendValue(address payable recipient, uint256 amount) internal {\n        require(address(this).balance >= amount, \"Address: insufficient balance\");\n\n        // solhint-disable-next-line avoid-call-value\n        (bool success, ) = recipient.call.value(amount)(\"\");\n        require(success, \"Address: unable to send value, recipient may have reverted\");\n    }\n}\n\nlibrary SafeERC20 {\n    using SafeMath for uint256;\n    using Address for address;\n\n    function safeTransfer(IERC20 token, address to, uint256 value) internal {\n        callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));\n    }\n    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {\n        callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));\n    }\n    function safeApprove(IERC20 token, address spender, uint256 value) internal {\n        require((value == 0) || (token.allowance(address(this), spender) == 0),\n            \"SafeERC20: approve from non-zero to non-zero allowance\"\n        );\n        callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));\n    }\n    function callOptionalReturn(IERC20 token, bytes memory data) private {\n        require(address(token).isContract(), \"SafeERC20: call to non-contract\");\n\n        // solhint-disable-next-line avoid-low-level-calls\n        (bool success, bytes memory returndata) = address(token).call(data);\n        require(success, \"SafeERC20: low-level call failed\");\n\n        if (returndata.length > 0) { // Return data is optional\n            // solhint-disable-next-line max-line-length\n            require(abi.decode(returndata, (bool)), \"SafeERC20: ERC20 operation did not succeed\");\n        }\n    }\n}\n\ninterface OptionsContract {\n    function liquidate(address payable vaultOwner, uint256 oTokensToLiquidate) external;\n    function maxOTokensLiquidatable(address payable vaultOwner) external view returns (uint256);\n    function isUnsafe(address payable vaultOwner) external view returns (bool);\n    function approve(address spender, uint256 amount) external returns (bool);\n    function hasVault(address owner) external returns (bool);\n    function balanceOf(address owner) external view returns (uint256);\n    function maxOTokensIssuable(uint256 _amount) external view returns (uint256);\n    function addETHCollateralOption(uint256 tokensToMint, address receiver) external payable;\n    function createETHCollateralOption(uint256 tokensToMint, address receiver) external payable;\n}\n\ncontract Structs {\n    struct Val {\n        uint256 value;\n    }\n\n    enum ActionType {\n      Deposit,   // supply tokens\n      Withdraw,  // borrow tokens\n      Transfer,  // transfer balance between accounts\n      Buy,       // buy an amount of some token (externally)\n      Sell,      // sell an amount of some token (externally)\n      Trade,     // trade tokens against another account\n      Liquidate, // liquidate an undercollateralized or expiring account\n      Vaporize,  // use excess tokens to zero-out a completely negative account\n      Call       // send arbitrary data to an address\n    }\n\n    enum AssetDenomination {\n        Wei // the amount is denominated in wei\n    }\n\n    enum AssetReference {\n        Delta // the amount is given as a delta from the current value\n    }\n\n    struct AssetAmount {\n        bool sign; // true if positive\n        AssetDenomination denomination;\n        AssetReference ref;\n        uint256 value;\n    }\n\n    struct ActionArgs {\n        ActionType actionType;\n        uint256 accountId;\n        AssetAmount amount;\n        uint256 primaryMarketId;\n        uint256 secondaryMarketId;\n        address otherAddress;\n        uint256 otherAccountId;\n        bytes data;\n    }\n\n    struct Info {\n        address owner;  // The address that owns the account\n        uint256 number; // A nonce that allows a single address to control many accounts\n    }\n\n    struct Wei {\n        bool sign; // true if positive\n        uint256 value;\n    }\n}\n\ncontract DyDx is Structs {\n    function getAccountWei(Info memory account, uint256 marketId) public view returns (Wei memory);\n    function operate(Info[] memory, ActionArgs[] memory) public;\n}\n\n\ncontract CurveFlash is ReentrancyGuard, Ownable, Structs {\n  using SafeERC20 for IERC20;\n  using Address for address;\n  using SafeMath for uint256;\n\n  address public dydx;\n  address public oCRV;\n  address payable public _vault;\n  uint256 public _amount;\n\n  constructor () public {\n    dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);\n    oCRV = address(0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B);\n  }\n\n  function liquidate(uint256 amount, address payable vault) public {\n    _vault = vault;\n    _amount = amount;\n\n    Info[] memory infos = new Info[](1);\n    ActionArgs[] memory args = new ActionArgs[](3);\n\n    infos[0] = Info(address(this), 0);\n\n    AssetAmount memory wamt = AssetAmount(false, AssetDenomination.Wei, AssetReference.Delta, amount);\n    ActionArgs memory withdraw;\n    withdraw.actionType = ActionType.Withdraw;\n    withdraw.accountId = 0;\n    withdraw.amount = wamt;\n    withdraw.primaryMarketId = 0;\n    withdraw.otherAddress = address(this);\n\n    args[0] = withdraw;\n\n    ActionArgs memory call;\n    call.actionType = ActionType.Call;\n    call.accountId = 0;\n    call.otherAddress = address(this);\n\n    args[1] = call;\n\n    ActionArgs memory deposit;\n    AssetAmount memory damt = AssetAmount(true, AssetDenomination.Wei, AssetReference.Delta, amount.add(1));\n    deposit.actionType = ActionType.Deposit;\n    deposit.accountId = 0;\n    deposit.amount = damt;\n    deposit.primaryMarketId = 0;\n    deposit.otherAddress = address(this);\n\n    args[2] = deposit;\n\n    DyDx(dydx).operate(infos, args);\n  }\n\n  function callFunction(\n      address sender,\n      Info memory accountInfo,\n      bytes memory data\n  ) public {\n    OptionsContract oToken = OptionsContract(oCRV);\n    require(oToken.isUnsafe(_vault), 'cannot liquidate a safe vault');\n    uint256 tokensToMint = oToken.maxOTokensIssuable(_amount);\n    if (oToken.hasVault(address(this))) {\n      oToken.addETHCollateralOption.value(_amount)(tokensToMint, address(this));\n    } else {\n      oToken.createETHCollateralOption.value(_amount)(tokensToMint, address(this));\n    }\n    oToken.liquidate(_vault, oToken.balanceOf(address(this)));\n  }\n\n  function() external payable {\n\n  }\n\n  // incase of half-way error\n  function inCaseTokenGetsStuck(IERC20 _TokenAddress) onlyOwner public {\n      uint qty = _TokenAddress.balanceOf(address(this));\n      _TokenAddress.safeTransfer(msg.sender, qty);\n  }\n\n  // incase of half-way error\n  function inCaseETHGetsStuck() onlyOwner public{\n      (bool result, ) = msg.sender.call.value(address(this).balance)(\"\");\n      require(result, \"transfer of ETH failed\");\n  }\n}\n",
   "sourcePath": "D:/ftm/itoken/contracts/oCurveFlashLiquidate.sol",
   "ast": {
@@ -29682,7 +29874,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-02-26T11:01:42.619Z",
+  "updatedAt": "2020-02-26T11:01:42.832Z",
   "devdoc": {
     "methods": {}
   },
