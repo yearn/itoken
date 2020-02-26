@@ -281,8 +281,6 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
 
     args[0] = withdraw;
 
-    WETH(weth).withdraw(_amount);
-
     ActionArgs memory call;
     call.actionType = ActionType.Call;
     call.accountId = 0;
@@ -298,8 +296,6 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
     deposit.primaryMarketId = 0;
     deposit.otherAddress = address(this);
 
-    WETH(weth).deposit.value(_amount)();
-
     args[2] = deposit;
 
     DyDx(dydx).operate(infos, args);
@@ -312,6 +308,9 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
   ) public {
     OptionsContract oToken = OptionsContract(oCRV);
     require(oToken.isUnsafe(_vault), 'cannot liquidate a safe vault');
+
+    WETH(weth).withdraw(_amount);
+
     uint256 tokensToMint = oToken.maxOTokensIssuable(_amount);
     if (oToken.hasVault(address(this))) {
       oToken.addETHCollateralOption.value(_amount)(tokensToMint, address(this));
@@ -319,6 +318,8 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
       oToken.createETHCollateralOption.value(_amount)(tokensToMint, address(this));
     }
     oToken.liquidate(_vault, oToken.balanceOf(address(this)));
+    
+    WETH(weth).deposit.value(_amount)();
   }
 
   function() external payable {
