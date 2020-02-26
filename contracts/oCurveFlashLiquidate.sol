@@ -245,26 +245,26 @@ contract DyDx is Structs {
 }
 
 
-contract CurveFlash is ReentrancyGuard, Ownable, Structs {
+contract oCurveFlashLiquidate is ReentrancyGuard, Ownable, Structs {
   using SafeERC20 for IERC20;
   using Address for address;
   using SafeMath for uint256;
 
   address public dydx;
-  address public oCRV;
   address public weth;
+  address payable public _oToken;
   address payable public _vault;
   uint256 public _amount;
 
   constructor () public {
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
-    oCRV = address(0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B);
     weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
   }
 
-  function liquidate(uint256 amount, address payable vault) public {
+  function liquidate(uint256 amount, address payable vault, address payable oToken) public {
     _vault = vault;
     _amount = amount;
+    _oToken = oToken;
 
     Info[] memory infos = new Info[](1);
     ActionArgs[] memory args = new ActionArgs[](3);
@@ -306,7 +306,7 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
       Info memory accountInfo,
       bytes memory data
   ) public {
-    OptionsContract oToken = OptionsContract(oCRV);
+    OptionsContract oToken = OptionsContract(_oToken);
     require(oToken.isUnsafe(_vault), 'cannot liquidate a safe vault');
 
     WETH(weth).withdraw(_amount);
