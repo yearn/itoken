@@ -311,14 +311,16 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
 
     WETH(weth).withdraw(_amount);
 
-    uint256 tokensToMint = oToken.maxOTokensIssuable(_amount);
+    uint256 tokensPerETH = oToken.maxOTokensIssuable(1e18);
+    uint256 maxToLiquidate = oToken.maxOTokensLiquidatable(_vault); //100 * 1e15
+    uint256 ethRequired = maxToLiquidate.mul(1e18).div(tokensPerETH);
     if (oToken.hasVault(address(this))) {
-      oToken.addETHCollateralOption.value(_amount)(tokensToMint, address(this));
+      oToken.addETHCollateralOption.value(ethRequired)(maxToLiquidate, address(this));
     } else {
-      oToken.createETHCollateralOption.value(_amount)(tokensToMint, address(this));
+      oToken.createETHCollateralOption.value(ethRequired)(maxToLiquidate, address(this));
     }
-    oToken.liquidate(_vault, oToken.balanceOf(address(this)));
-    
+    oToken.liquidate(_vault, maxToLiquidate);
+
     WETH(weth).deposit.value(_amount)();
   }
 
