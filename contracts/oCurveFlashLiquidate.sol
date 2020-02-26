@@ -180,6 +180,11 @@ interface OptionsContract {
     function createETHCollateralOption(uint256 tokensToMint, address receiver) external payable;
 }
 
+interface WETH {
+  function withdraw(uint256 amount) external;
+  function deposit() external payable;
+}
+
 contract Structs {
     struct Val {
         uint256 value;
@@ -247,12 +252,14 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
 
   address public dydx;
   address public oCRV;
+  address public weth;
   address payable public _vault;
   uint256 public _amount;
 
   constructor () public {
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
     oCRV = address(0x4BA8C6Ce0e855C051e65DfC37883360efAf7c82B);
+    weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
   }
 
   function liquidate(uint256 amount, address payable vault) public {
@@ -274,6 +281,8 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
 
     args[0] = withdraw;
 
+    WETH(weth).withdraw(_amount);
+
     ActionArgs memory call;
     call.actionType = ActionType.Call;
     call.accountId = 0;
@@ -288,6 +297,8 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
     deposit.amount = damt;
     deposit.primaryMarketId = 0;
     deposit.otherAddress = address(this);
+
+    WETH(weth).deposit.value(_amount)();
 
     args[2] = deposit;
 
