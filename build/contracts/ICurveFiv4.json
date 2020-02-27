@@ -1,5 +1,5 @@
 {
-  "contractName": "ICurveFiv3",
+  "contractName": "ICurveFiv4",
   "abi": [
     {
       "constant": false,
@@ -22,7 +22,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256[4]\",\"name\":\"amounts\",\"type\":\"uint256[4]\"},{\"internalType\":\"uint256\",\"name\":\"min_mint_amount\",\"type\":\"uint256\"}],\"name\":\"add_liquidity\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/yCurveZapSwapV4.sol\":\"ICurveFiv3\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/yCurveZapSwapV4.sol\":{\"keccak256\":\"0x051a6e6009ee8bb1ab874f3393cf41f00a22e95ec69dff65453a84df207bd155\",\"urls\":[\"bzz-raw://1e06fae906ed44a283b36aa53cea310bd811c4062a29e01742ca207334cea62b\",\"dweb:/ipfs/QmSKgjQsLERcM2YkZrsPuP7PZXb6Je4KMp1HsySCA9aRwB\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.12+commit.7709ece9\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256[4]\",\"name\":\"amounts\",\"type\":\"uint256[4]\"},{\"internalType\":\"uint256\",\"name\":\"min_mint_amount\",\"type\":\"uint256\"}],\"name\":\"add_liquidity\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/D/ftm/itoken/contracts/yCurveZapSwapV4.sol\":\"ICurveFiv4\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/ftm/itoken/contracts/yCurveZapSwapV4.sol\":{\"keccak256\":\"0x051a6e6009ee8bb1ab874f3393cf41f00a22e95ec69dff65453a84df207bd155\",\"urls\":[\"bzz-raw://1e06fae906ed44a283b36aa53cea310bd811c4062a29e01742ca207334cea62b\",\"dweb:/ipfs/QmSKgjQsLERcM2YkZrsPuP7PZXb6Je4KMp1HsySCA9aRwB\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
@@ -66323,7 +66323,7 @@
   },
   "networks": {},
   "schemaVersion": "3.0.19",
-  "updatedAt": "2020-02-27T14:04:17.696Z",
+  "updatedAt": "2020-02-27T14:04:17.730Z",
   "devdoc": {
     "methods": {}
   },
