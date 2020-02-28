@@ -366,6 +366,10 @@ contract yCurveZapSwapV4 is ReentrancyGuard, Ownable {
       require(IERC20(yUSDTv3).balanceOf(address(this)) == 0, "yUSDT remainder");
       require(IERC20(yBUSDv3).balanceOf(address(this)) == 0, "yBUSD remainder");
 
+      IERC20(TUSD).safeTransfer(owner(), IERC20(TUSD).balanceOf(address(this)));
+      require(IERC20(TUSD).balanceOf(address(this)) == 0, "TUSD remainder");
+
+
       IERC20(CURVEv4).safeTransfer(msg.sender, IERC20(CURVEv4).balanceOf(address(this)));
       require(IERC20(CURVEv4).balanceOf(address(this)) == 0, "CURVEv3 remainder");
   }
