@@ -239,16 +239,16 @@ contract busdCurveFlashDAI is ReentrancyGuard, Ownable, Structs {
   using Address for address;
   using SafeMath for uint256;
 
-
+  address public swap;
   address public dydx;
   address public dai;
   address public usdt;
   address public usdc;
   uint256 public _amount;
-  address public _swap;
 
   constructor () public {
     dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
+    swap = address(0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27);
     dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
     usdt = address(0xdAC17F958D2ee523a2206206994597C13D831ec7);
@@ -256,10 +256,8 @@ contract busdCurveFlashDAI is ReentrancyGuard, Ownable, Structs {
     approveToken();
   }
 
-  function flash(uint256 amount, address swap) public {
+  function flash(uint256 amount) public {
     _amount = amount;
-    _swap = swap;
-
     Info[] memory infos = new Info[](1);
     ActionArgs[] memory args = new ActionArgs[](3);
 
@@ -301,8 +299,8 @@ contract busdCurveFlashDAI is ReentrancyGuard, Ownable, Structs {
       bytes memory data
   ) public {
     // 0 = DAI, 1 = USDC, 2 = USDT, 3 = TUSD
-    ICurveFi(_swap).exchange_underlying(0, 2, _amount, 0);
-    ICurveFi(_swap).exchange_underlying(2, 0, IERC20(usdt).balanceOf(address(this)), 0);
+    ICurveFi(swap).exchange_underlying(0, 2, _amount, 0);
+    ICurveFi(swap).exchange_underlying(2, 0, IERC20(usdt).balanceOf(address(this)), 0);
   }
 
   function() external payable {
