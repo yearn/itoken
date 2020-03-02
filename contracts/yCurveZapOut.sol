@@ -231,8 +231,8 @@ contract yCurveZapOut is ReentrancyGuard, Ownable {
       IERC20(yTUSD).safeApprove(SWAP, uint(-1));
   }
 
-  function checkSlippage(uint256 _amount, address _token) public view returns (bool) {
-    uint256 received = IERC20(_token).balanceOf(address(this));
+  function checkSlippage(uint256 _amount, address _token, uint256 _dec) public view returns (bool) {
+    uint256 received = (IERC20(_token).balanceOf(address(this))).mul(_dec);
     uint256 fivePercent = _amount.mul(5).div(100);
     uint256 min = _amount.sub(fivePercent);
     uint256 max = _amount.add(fivePercent);
@@ -276,7 +276,7 @@ contract yCurveZapOut is ReentrancyGuard, Ownable {
       yERC20(yDAI).withdraw(IERC20(yDAI).balanceOf(address(this)));
       require(IERC20(yDAI).balanceOf(address(this)) == 0, "y.DAI remainder");
 
-      checkSlippage(_amount, DAI);
+      checkSlippage(_amount, DAI, 1);
 
       IERC20(DAI).safeTransfer(msg.sender, IERC20(DAI).balanceOf(address(this)));
       require(IERC20(DAI).balanceOf(address(this)) == 0, "DAI remainder");
@@ -311,7 +311,7 @@ contract yCurveZapOut is ReentrancyGuard, Ownable {
       yERC20(yUSDC).withdraw(IERC20(yUSDC).balanceOf(address(this)));
       require(IERC20(yUSDC).balanceOf(address(this)) == 0, "y.USDC remainder");
 
-      checkSlippage(_amount, USDC);
+      checkSlippage(_amount, USDC, 1e12);
 
       IERC20(USDC).safeTransfer(msg.sender, IERC20(USDC).balanceOf(address(this)));
       require(IERC20(USDC).balanceOf(address(this)) == 0, "USDC remainder");
@@ -346,7 +346,7 @@ contract yCurveZapOut is ReentrancyGuard, Ownable {
       yERC20(yUSDT).withdraw(IERC20(yUSDT).balanceOf(address(this)));
       require(IERC20(yUSDT).balanceOf(address(this)) == 0, "y.USDT remainder");
 
-      checkSlippage(_amount, USDT);
+      checkSlippage(_amount, USDT, 1e12);
 
       IERC20(USDT).safeTransfer(msg.sender, IERC20(USDT).balanceOf(address(this)));
       require(IERC20(USDT).balanceOf(address(this)) == 0, "USDT remainder");
@@ -381,7 +381,7 @@ contract yCurveZapOut is ReentrancyGuard, Ownable {
       yERC20(yTUSD).withdraw(IERC20(yTUSD).balanceOf(address(this)));
       require(IERC20(yTUSD).balanceOf(address(this)) == 0, "y.TUSD remainder");
 
-      checkSlippage(_amount, TUSD);
+      checkSlippage(_amount, TUSD, 1);
 
       IERC20(TUSD).safeTransfer(msg.sender, IERC20(TUSD).balanceOf(address(this)));
       require(IERC20(TUSD).balanceOf(address(this)) == 0, "TUSD remainder");
