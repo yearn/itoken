@@ -269,6 +269,12 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       yERC20(yDAI).withdraw(IERC20(yDAI).balanceOf(address(this)));
       require(IERC20(yDAI).balanceOf(address(this)) == 0, "y.DAI remainder");
 
+      uint256 received = IERC20(DAI).balanceOf(address(this));
+      uint256 fivePercent = _amount.mul(5).div(100);
+      uint256 min = _amount.sub(fivePercent);
+      uint256 max = _amount.add(fivePercent);
+      require(received <= max && received >= min, "slippage greater than 5%");
+
       IERC20(DAI).safeTransfer(msg.sender, IERC20(DAI).balanceOf(address(this)));
       require(IERC20(DAI).balanceOf(address(this)) == 0, "DAI remainder");
   }
@@ -305,6 +311,12 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
 
       yERC20(yUSDC).withdraw(IERC20(yUSDC).balanceOf(address(this)));
       require(IERC20(yUSDC).balanceOf(address(this)) == 0, "y.USDC remainder");
+
+      uint256 received = IERC20(USDC).balanceOf(address(this));
+      uint256 fivePercent = _amount.mul(5).div(100);
+      uint256 min = _amount.sub(fivePercent);
+      uint256 max = _amount.add(fivePercent);
+      require(received <= max && received >= min, "slippage greater than 5%");
 
       IERC20(USDC).safeTransfer(msg.sender, IERC20(USDC).balanceOf(address(this)));
       require(IERC20(USDC).balanceOf(address(this)) == 0, "USDC remainder");
@@ -343,6 +355,12 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       yERC20(yUSDT).withdraw(IERC20(yUSDT).balanceOf(address(this)));
       require(IERC20(yUSDT).balanceOf(address(this)) == 0, "y.USDT remainder");
 
+      uint256 received = IERC20(USDT).balanceOf(address(this));
+      uint256 fivePercent = _amount.mul(5).div(100);
+      uint256 min = _amount.sub(fivePercent);
+      uint256 max = _amount.add(fivePercent);
+      require(received <= max && received >= min, "slippage greater than 5%");
+
       IERC20(USDT).safeTransfer(msg.sender, IERC20(USDT).balanceOf(address(this)));
       require(IERC20(USDT).balanceOf(address(this)) == 0, "USDT remainder");
   }
@@ -379,6 +397,12 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
 
       yERC20(yBUSD).withdraw(IERC20(yBUSD).balanceOf(address(this)));
       require(IERC20(yBUSD).balanceOf(address(this)) == 0, "y.BUSD remainder");
+
+      uint256 received = IERC20(BUSD).balanceOf(address(this));
+      uint256 fivePercent = _amount.mul(5).div(100);
+      uint256 min = _amount.sub(fivePercent);
+      uint256 max = _amount.add(fivePercent);
+      require(received <= max && received >= min, "slippage greater than 5%");
 
       IERC20(BUSD).safeTransfer(msg.sender, IERC20(BUSD).balanceOf(address(this)));
       require(IERC20(BUSD).balanceOf(address(this)) == 0, "BUSD remainder");
