@@ -231,20 +231,27 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       IERC20(yBUSD).safeApprove(SWAP, uint(-1));
   }
 
-  // 0 = dai
-  // 1 = usdc
-  // 2 = usdt
-  // 3 = busd
+  function checkSlippage(uint256 _amount, address _token) public view returns (bool) {
+    uint256 received = IERC20(_token).balanceOf(address(this));
+    uint256 fivePercent = _amount.mul(5).div(100);
+    uint256 min = _amount.sub(fivePercent);
+    uint256 max = _amount.add(fivePercent);
+    require(received <= max && received >= min, "slippage greater than 5%");
+    return true;
+  }
+
+  function withdrawCurve(uint256 _amount) public {
+    require(_amount > 0, "deposit must be greater than 0");
+    IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
+    ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
+    require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
+  }
 
   function withdrawDAI(uint256 _amount)
       external
       nonReentrant
   {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
+      withdrawCurve(_amount);
 
       uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
       uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
@@ -269,11 +276,7 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       yERC20(yDAI).withdraw(IERC20(yDAI).balanceOf(address(this)));
       require(IERC20(yDAI).balanceOf(address(this)) == 0, "y.DAI remainder");
 
-      uint256 received = IERC20(DAI).balanceOf(address(this));
-      uint256 fivePercent = _amount.mul(5).div(100);
-      uint256 min = _amount.sub(fivePercent);
-      uint256 max = _amount.add(fivePercent);
-      require(received <= max && received >= min, "slippage greater than 5%");
+      checkSlippage(_amount, DAI);
 
       IERC20(DAI).safeTransfer(msg.sender, IERC20(DAI).balanceOf(address(this)));
       require(IERC20(DAI).balanceOf(address(this)) == 0, "DAI remainder");
@@ -283,11 +286,7 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       external
       nonReentrant
   {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
+      withdrawCurve(_amount);
 
       uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
       uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
@@ -312,11 +311,7 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       yERC20(yUSDC).withdraw(IERC20(yUSDC).balanceOf(address(this)));
       require(IERC20(yUSDC).balanceOf(address(this)) == 0, "y.USDC remainder");
 
-      uint256 received = IERC20(USDC).balanceOf(address(this));
-      uint256 fivePercent = _amount.mul(5).div(100);
-      uint256 min = _amount.sub(fivePercent);
-      uint256 max = _amount.add(fivePercent);
-      require(received <= max && received >= min, "slippage greater than 5%");
+      checkSlippage(_amount, USDC);
 
       IERC20(USDC).safeTransfer(msg.sender, IERC20(USDC).balanceOf(address(this)));
       require(IERC20(USDC).balanceOf(address(this)) == 0, "USDC remainder");
@@ -326,11 +321,7 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       external
       nonReentrant
   {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
+      withdrawCurve(_amount);
 
       uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
       uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
@@ -355,11 +346,7 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       yERC20(yUSDT).withdraw(IERC20(yUSDT).balanceOf(address(this)));
       require(IERC20(yUSDT).balanceOf(address(this)) == 0, "y.USDT remainder");
 
-      uint256 received = IERC20(USDT).balanceOf(address(this));
-      uint256 fivePercent = _amount.mul(5).div(100);
-      uint256 min = _amount.sub(fivePercent);
-      uint256 max = _amount.add(fivePercent);
-      require(received <= max && received >= min, "slippage greater than 5%");
+      checkSlippage(_amount, USDT);
 
       IERC20(USDT).safeTransfer(msg.sender, IERC20(USDT).balanceOf(address(this)));
       require(IERC20(USDT).balanceOf(address(this)) == 0, "USDT remainder");
@@ -369,11 +356,7 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       external
       nonReentrant
   {
-      require(_amount > 0, "deposit must be greater than 0");
-      IERC20(CURVE).safeTransferFrom(msg.sender, address(this), _amount);
-
-      ICurveFi(SWAP).remove_liquidity(IERC20(CURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
-      require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
+      withdrawCurve(_amount);
 
       uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
       uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
@@ -398,11 +381,7 @@ contract yCurveZapOutV4 is ReentrancyGuard, Ownable {
       yERC20(yBUSD).withdraw(IERC20(yBUSD).balanceOf(address(this)));
       require(IERC20(yBUSD).balanceOf(address(this)) == 0, "y.BUSD remainder");
 
-      uint256 received = IERC20(BUSD).balanceOf(address(this));
-      uint256 fivePercent = _amount.mul(5).div(100);
-      uint256 min = _amount.sub(fivePercent);
-      uint256 max = _amount.add(fivePercent);
-      require(received <= max && received >= min, "slippage greater than 5%");
+      checkSlippage(_amount, BUSD);
 
       IERC20(BUSD).safeTransfer(msg.sender, IERC20(BUSD).balanceOf(address(this)));
       require(IERC20(BUSD).balanceOf(address(this)) == 0, "BUSD remainder");
