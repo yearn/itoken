@@ -232,6 +232,7 @@ contract yCurveZapIn is ReentrancyGuard, Ownable {
       IERC20(USDC).safeApprove(yUSDC, uint(-1));
       IERC20(yUSDC).safeApprove(SWAP, uint(-1));
 
+      IERC20(USDT).safeApprove(yUSDT, uint(0));
       IERC20(USDT).safeApprove(yUSDT, uint(-1));
       IERC20(yUSDT).safeApprove(SWAP, uint(-1));
 
