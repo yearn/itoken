@@ -271,8 +271,8 @@ contract yCurveZapInV4 is ReentrancyGuard, Ownable {
       require(IERC20(yUSDC).balanceOf(address(this)) == 0, "yToken remainder");
       uint256 received = IERC20(CURVE).balanceOf(address(this));
       uint256 fivePercent = _amount.mul(5).div(100);
-      uint256 min = _amount.sub(fivePercent);
-      uint256 max = _amount.add(fivePercent);
+      uint256 min = (_amount.sub(fivePercent)).mul(1e12);
+      uint256 max = (_amount.add(fivePercent)).mul(1e12);
       require(received <= max && received >= min, "slippage greater than 5%");
       IERC20(CURVE).safeTransfer(msg.sender, IERC20(CURVE).balanceOf(address(this)));
       require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
@@ -290,8 +290,8 @@ contract yCurveZapInV4 is ReentrancyGuard, Ownable {
       require(IERC20(yUSDT).balanceOf(address(this)) == 0, "yToken remainder");
       uint256 received = IERC20(CURVE).balanceOf(address(this));
       uint256 fivePercent = _amount.mul(5).div(100);
-      uint256 min = _amount.sub(fivePercent);
-      uint256 max = _amount.add(fivePercent);
+      uint256 min = (_amount.sub(fivePercent)).mul(1e12);
+      uint256 max = (_amount.add(fivePercent)).mul(1e12);
       require(received <= max && received >= min, "slippage greater than 5%");
       IERC20(CURVE).safeTransfer(msg.sender, IERC20(CURVE).balanceOf(address(this)));
       require(IERC20(CURVE).balanceOf(address(this)) == 0, "CURVE remainder");
