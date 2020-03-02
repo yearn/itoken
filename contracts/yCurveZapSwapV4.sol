@@ -228,8 +228,6 @@ contract yCurveZapSwapV4 is ReentrancyGuard, Ownable {
   address public yUSDTv3;
   address public TUSD;
   address public yTUSDv2;
-  address public BUSD;
-  address public yBUSDv3;
   address public SWAPv1;
   address public CURVEv1;
   address public SWAPv2;
@@ -256,10 +254,6 @@ contract yCurveZapSwapV4 is ReentrancyGuard, Ownable {
     USDT = address(0xdAC17F958D2ee523a2206206994597C13D831ec7);
     yUSDTv2 = address(0x83f798e925BcD4017Eb265844FDDAbb448f1707D);
     yUSDTv3 = address(0xE6354ed5bC4b393a5Aad09f21c46E101e692d447);
-
-    BUSD = address(0x4Fabb145d64652a948d72533023f6E7A623C7C53);
-    yBUSDv3 = address(0x04bC0Ab673d88aE9dbC9DA2380cB6B79C4BCa9aE);
-
 
     SWAPv1 = address(0x2e60CF74d81ac34eB21eEff58Db4D385920ef419);
     CURVEv1 = address(0x3740fb63ab7a09891d7c0d4299442A551D06F5fD);
@@ -294,9 +288,6 @@ contract yCurveZapSwapV4 is ReentrancyGuard, Ownable {
       IERC20(USDC).safeApprove(yUSDCv3, uint(-1));
       IERC20(yUSDCv2).safeApprove(SWAPv3, uint(-1));
       IERC20(yUSDCv3).safeApprove(SWAPv4, uint(-1));
-
-      IERC20(BUSD).safeApprove(yBUSDv3, uint(-1));
-      IERC20(yBUSDv3).safeApprove(SWAPv4, uint(-1));
 
       IERC20(USDT).safeApprove(yUSDTv2, uint(0));
       IERC20(USDT).safeApprove(yUSDTv2, uint(-1));
@@ -351,24 +342,25 @@ contract yCurveZapSwapV4 is ReentrancyGuard, Ownable {
         require(IERC20(USDT).balanceOf(address(this)) == 0, "usdc remainder");
       }
 
-      if (_tusd > 0) {
-        yERC20(yBUSDv3).deposit(_tusd);
-      }
 
       ICurveFiv4(SWAPv4).add_liquidity([
         IERC20(yDAIv3).balanceOf(address(this)),
         IERC20(yUSDCv3).balanceOf(address(this)),
         IERC20(yUSDTv3).balanceOf(address(this)),
-        IERC20(yBUSDv3).balanceOf(address(this))],0);
+        0],0);
 
       require(IERC20(yDAIv3).balanceOf(address(this)) == 0, "yDAI remainder");
       require(IERC20(yUSDCv3).balanceOf(address(this)) == 0, "yUSDC remainder");
       require(IERC20(yUSDTv3).balanceOf(address(this)) == 0, "yUSDT remainder");
-      require(IERC20(yBUSDv3).balanceOf(address(this)) == 0, "yBUSD remainder");
 
-      IERC20(TUSD).safeTransfer(owner(), IERC20(TUSD).balanceOf(address(this)));
+      IERC20(TUSD).safeTransfer(msg.sender, IERC20(TUSD).balanceOf(address(this)));
       require(IERC20(TUSD).balanceOf(address(this)) == 0, "TUSD remainder");
 
+      uint256 received = IERC20(CURVEv4).balanceOf(address(this));
+      uint256 fivePercent = _amount.mul(5).div(100);
+      uint256 min = _amount.sub(fivePercent);
+      uint256 max = _amount.add(fivePercent);
+      require(received <= max && received >= min, "slippage greater than 5%");
 
       IERC20(CURVEv4).safeTransfer(msg.sender, IERC20(CURVEv4).balanceOf(address(this)));
       require(IERC20(CURVEv4).balanceOf(address(this)) == 0, "CURVEv3 remainder");
