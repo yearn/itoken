@@ -552,15 +552,24 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     }
     amount = balanceDydx();
     if (amount > 0) {
-      _withdrawDydx(balanceDydxAvailable());
+      if (amount > balanceDydxAvailable()) {
+        amount = balanceDydxAvailable();
+      }
+      _withdrawDydx(amount);
     }
     amount = balanceFulcrum();
     if (amount > 0) {
-      _withdrawSomeFulcrum(balanceFulcrumAvailable().sub(1));
+      if (amount > balanceFulcrumAvailable().sub(1)) {
+        amount = balanceFulcrumAvailable().sub(1);
+      }
+      _withdrawSomeFulcrum(amount);
     }
     amount = balanceAave();
     if (amount > 0) {
-      _withdrawAave(balanceAaveAvailable());
+      if (amount > balanceAaveAvailable()) {
+        amount = balanceAaveAvailable();
+      }
+      _withdrawAave(amount);
     }
   }
 

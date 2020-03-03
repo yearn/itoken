@@ -357,9 +357,10 @@ contract yCurveZapSwapV4 is ReentrancyGuard, Ownable {
       require(IERC20(TUSD).balanceOf(address(this)) == 0, "TUSD remainder");
 
       uint256 received = IERC20(CURVEv4).balanceOf(address(this));
-      uint256 fivePercent = _amount.mul(5).div(100);
-      uint256 min = _amount.sub(fivePercent);
-      uint256 max = _amount.add(fivePercent);
+      uint256 deposit = _dai.add((_usdc.mul(1e12))).add((_usdt.mul(1e12)));
+      uint256 fivePercent = deposit.mul(5).div(100);
+      uint256 min = deposit.sub(fivePercent);
+      uint256 max = deposit.add(fivePercent);
       require(received <= max && received >= min, "slippage greater than 5%");
 
       IERC20(CURVEv4).safeTransfer(msg.sender, IERC20(CURVEv4).balanceOf(address(this)));
