@@ -371,16 +371,16 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   using SafeMath for uint256;
 
   uint256 public pool;
-  address public token;
-  address public compound;
-  address public fulcrum;
-  address public aave;
-  address public aavePool;
-  address public aaveToken;
-  address public dydx;
-  uint256 public dToken;
-  address public apr;
-  address public chai;
+  address public constant token = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+  address public constant compound = address(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
+  address public constant fulcrum = address(0x493C57C4763932315A328269E1ADaD09653B9081);
+  address public constant aave = address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
+  address public constant aavePool = address(0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3);
+  address public constant aaveToken = address(0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d);
+  address public constant dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
+  uint256 public constant dToken = 3;
+  address public constant apr = address(0xdD6d648C991f7d47454354f4Ef326b04025a48A8);
+  address public constant chai = address(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
 
   enum Lender {
       NONE,
@@ -393,16 +393,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   Lender public provider = Lender.NONE;
 
   constructor () public ERC20Detailed("iearn DAI", "yDAI", 18) {
-    token = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    apr = address(0xdD6d648C991f7d47454354f4Ef326b04025a48A8);
-    dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
-    aave = address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8);
-    aavePool = address(0x3dfd23A6c5E8BbcFc9581d2E864a68feb6a076d3);
-    fulcrum = address(0x493C57C4763932315A328269E1ADaD09653B9081);
-    aaveToken = address(0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d);
-    compound = address(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
-    chai = address(0x06AF07097C9Eeb7fD685c692751D5C66dB49c215);
-    dToken = 3;
     approveToken();
   }
 
