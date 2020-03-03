@@ -594,21 +594,55 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs {
     _withdrawFulcrum(amount);
   }
 
-  function _withdrawSome(uint256 _amount) internal {
-    if (provider == Lender.COMPOUND) {
-      _withdrawSomeCompound(_amount);
+  function _withdrawSome(uint256 _amount) internal returns (bool) {
+    uint256 origAmount = _amount;
+
+    uint256 amount = balanceCompound();
+    if (amount > 0) {
+      if (_amount > balanceCompoundInToken().sub(1)) {
+        _withdrawSomeCompound(balanceCompoundInToken().sub(1));
+        _amount = origAmount.sub(IERC20(token).balanceOf(address(this)));
+      } else {
+        _withdrawSomeCompound(_amount);
+        return true;
+      }
     }
-    if (provider == Lender.AAVE) {
-      require(balanceAave() >= _amount, "insufficient funds");
-      _withdrawAave(_amount);
+
+    amount = balanceDydx();
+    if (amount > 0) {
+      if (_amount > balanceDydxAvailable()) {
+        _withdrawDydx(balanceDydxAvailable());
+        _amount = origAmount.sub(IERC20(token).balanceOf(address(this)));
+      } else {
+        _withdrawDydx(_amount);
+        return true;
+      }
     }
-    if (provider == Lender.DYDX) {
-      require(balanceDydx() >= _amount, "insufficient funds");
-      _withdrawDydx(_amount);
+
+    amount = balanceFulcrum();
+    if (amount > 0) {
+      if (_amount > balanceFulcrumAvailable().sub(1)) {
+        amount = balanceFulcrumAvailable().sub(1);
+        _withdrawSomeFulcrum(balanceFulcrumAvailable().sub(1));
+        _amount = origAmount.sub(IERC20(token).balanceOf(address(this)));
+      } else {
+        _withdrawSomeFulcrum(amount);
+        return true;
+      }
     }
-    if (provider == Lender.FULCRUM) {
-      _withdrawSomeFulcrum(_amount);
+
+    amount = balanceAave();
+    if (amount > 0) {
+      if (_amount > balanceAaveAvailable()) {
+        _withdrawAave(balanceAaveAvailable());
+        _amount = origAmount.sub(IERC20(token).balanceOf(address(this)));
+      } else {
+        _withdrawAave(_amount);
+        return true;
+      }
     }
+
+    return true;
   }
 
   function rebalance() public {
