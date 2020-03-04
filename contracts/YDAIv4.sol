@@ -61,11 +61,11 @@ contract Ownable is Context {
 contract ERC20 is Context, IERC20 {
     using SafeMath for uint256;
 
-    mapping (address => uint256) _balances;
+    mapping (address => uint256) private _balances;
 
     mapping (address => mapping (address => uint256)) private _allowances;
 
-    uint256 _totalSupply;
+    uint256 private _totalSupply;
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -411,7 +411,7 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
         shares = _amount;
         pool = _amount;
       } else {
-        shares = (_amount.mul(_totalSupply)).div(pool);
+        shares = (_amount.mul(totalSupply())).div(pool);
       }
       pool = calcPoolValueInToken();
       _mint(msg.sender, shares);
@@ -430,13 +430,8 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
       // Could have over value from cTokens
       pool = calcPoolValueInToken();
       // Calc to redeem before updating balances
-      uint256 r = (pool.mul(_shares)).div(_totalSupply);
-
-
-      _balances[msg.sender] = _balances[msg.sender].sub(_shares, "redeem amount exceeds balance");
-      _totalSupply = _totalSupply.sub(_shares);
-
-      emit Transfer(msg.sender, address(0), _shares);
+      uint256 r = (pool.mul(_shares)).div(totalSupply());
+      _burn(msg.sender, _shares);
 
       // Check balance
       uint256 b = IERC20(token).balanceOf(address(this));
@@ -717,6 +712,6 @@ contract yDAI is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
 
   function getPricePerFullShare() public view returns (uint) {
     uint _pool = calcPoolValueInToken();
-    return _pool.mul(1e18).div(_totalSupply);
+    return _pool.mul(1e18).div(totalSupply());
   }
 }

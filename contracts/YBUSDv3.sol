@@ -503,14 +503,7 @@ contract yBUSD is ERC20, ERC20Detailed, ReentrancyGuard, Structs, Ownable {
   }
 
   function approveToken() public {
-      IERC20(token).safeApprove(compound, uint(0));
-      IERC20(token).safeApprove(compound, uint(-1));
-      IERC20(token).safeApprove(dydx, uint(0));
-      IERC20(token).safeApprove(dydx, uint(-1));
-      IERC20(token).safeApprove(getAaveCore(), uint(0));
       IERC20(token).safeApprove(getAaveCore(), uint(-1));
-      IERC20(token).safeApprove(fulcrum, uint(0));
-      IERC20(token).safeApprove(fulcrum, uint(-1));
   }
 
   function balance() public view returns (uint256) {
