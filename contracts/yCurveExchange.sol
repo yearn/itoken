@@ -481,7 +481,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
   }
   function remove_liquidity_underlying(uint256 _amount, uint256[5] calldata min_amounts) external nonReentrant {
     IERC20(sCURVE).safeTransferFrom(msg.sender, address(this), _amount);
-    _remove_liquidity(_amount, min_amounts);
+    _remove_liquidity(min_amounts);
     uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
     uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
     uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
@@ -511,7 +511,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
   }
   function remove_liquidity_underlying_to(int128 j, uint256 _amount, uint256 _min_amount) external nonReentrant {
     IERC20(sCURVE).safeTransferFrom(msg.sender, address(this), _amount);
-    _remove_liquidity(_amount, [uint256(0),0,0,0,0]);
+    _remove_liquidity([uint256(0),0,0,0,0]);
     _swap_to(j);
     yERC20(get_address(j)).withdraw(IERC20(j).balanceOf(address(this)));
     address _uj = get_address_underlying(j);
@@ -521,7 +521,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
   }
   function remove_liquidity_to(int128 j, uint256 _amount, uint256 _min_amount) external nonReentrant {
     IERC20(sCURVE).safeTransferFrom(msg.sender, address(this), _amount);
-    _remove_liquidity(_amount, [uint256(0),0,0,0,0]);
+    _remove_liquidity([uint256(0),0,0,0,0]);
     _swap_to(j);
     address _j = get_address(j);
     uint256 _dy = IERC20(_j).balanceOf(address(this));
@@ -530,7 +530,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
   }
   function remove_liquidity(uint256 _amount, uint256[5] calldata min_amounts) external nonReentrant {
     IERC20(sCURVE).safeTransferFrom(msg.sender, address(this), _amount);
-    _remove_liquidity(_amount, min_amounts);
+    _remove_liquidity(min_amounts);
     uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
     uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
     uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
@@ -553,7 +553,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
       IERC20(ySUSD).safeTransfer(msg.sender, _ysusd);
     }
   }
-  function _remove_liquidity(uint256 _amount, uint256[5] memory min_amounts) internal {
+  function _remove_liquidity(uint256[5] memory min_amounts) internal {
     uint256[2] memory _s;
     _s[0] = min_amounts[4];
     sCurveFi(sSWAP).remove_liquidity(IERC20(sCURVE).balanceOf(address(this)), _s);
@@ -624,16 +624,16 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
   }
 
   function calc_token_amount(uint256[5] calldata amounts, bool deposit) external view returns (uint256) {
-    uint256[4] _y;
+    uint256[4] memory _y;
     _y[0] = amounts[0];
     _y[1] = amounts[1];
     _y[2] = amounts[2];
     _y[3] = amounts[3];
-    uint256 _y_output = CurveFi(ySWAP).calc_token_amount(_y, deposit);
-    uint256[2] _s;
+    uint256 _y_output = yCurveFi(ySWAP).calc_token_amount(_y, deposit);
+    uint256[2] memory _s;
     _s[0] = amounts[4];
     _s[1] = _y_output;
-    return CurveFi(sSWAP).calc_token_amount(_s, deposit);
+    return sCurveFi(sSWAP).calc_token_amount(_s, deposit);
   }
 
   // incase of half-way error
