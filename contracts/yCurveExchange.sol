@@ -252,8 +252,8 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
   address public constant SUSD = address(0x57Ab1ec28D129707052df4dF418D58a2D46d5f51);
   address public constant ySWAP = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
   address public constant yCURVE = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
-  address public constant sSWAP = address(0x0);
-  address public constant sCURVE = address(0x0);
+  address public constant sSWAP = address(0xeDf54bC005bc2Df0Cc6A675596e843D28b16A966);
+  address public constant sCURVE = address(0x2b645a6A426f22fB7954dC15E583e3737B8d1434);
 
   constructor () public {
     approveToken();
@@ -313,7 +313,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
     } else if (j == 4) {
       uint256[4] memory amounts;
       amounts[uint256(i)] = IERC20(get_address(i)).balanceOf(address(this));
-      yCurveFi(ySWAP).add_liquidity(amounts,0);
+      yCurveFi(ySWAP).add_liquidity(amounts, 0);
       CurveFi(sSWAP).exchange(1, 0, IERC20(yCURVE).balanceOf(address(this)), min_dy);
     } else {
       CurveFi(ySWAP).exchange(i, j, dx, min_dy);
@@ -621,6 +621,19 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
     } else {
       return CurveFi(ySWAP).get_dy(i, j, dx);
     }
+  }
+
+  function calc_token_amount(uint256[5] calldata amounts, bool deposit) external view returns (uint256) {
+    uint256[4] _y;
+    _y[0] = amounts[0];
+    _y[1] = amounts[1];
+    _y[2] = amounts[2];
+    _y[3] = amounts[3];
+    uint256 _y_output = CurveFi(ySWAP).calc_token_amount(_y, deposit);
+    uint256[2] _s;
+    _s[0] = amounts[4];
+    _s[1] = _y_output;
+    return CurveFi(sSWAP).calc_token_amount(_s, deposit);
   }
 
   // incase of half-way error
