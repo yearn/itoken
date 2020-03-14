@@ -233,31 +233,84 @@ contract DyDx is Structs {
     function operate(Info[] memory, ActionArgs[] memory) public;
 }
 
+interface OneSplit {
+
+    function goodSwap(
+        address fromToken,
+        address toToken,
+        uint256 amount,
+        uint256 minReturn,
+        uint256 parts,
+        uint256 disableFlags // 1 - Uniswap, 2 - Kyber, 4 - Bancor, 8 - Oasis, 16 - Compound, 32 - Fulcrum, 64 - Chai, 128 - Aave, 256 - SmartToken
+    )
+        external
+        payable;
+}
+
 
 contract CurveFlash is ReentrancyGuard, Ownable, Structs {
   using SafeERC20 for IERC20;
   using Address for address;
   using SafeMath for uint256;
 
-  address public swap;
-  address public dydx;
-  address public dai;
-  address public usdt;
-  address public usdc;
-  uint256 public _amount;
+  address constant public one = address(0x64D04c6dA4B0bC0109D7fC29c9D09c802C061898);
+  address public constant dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
+
+  address public constant dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+  address public constant usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+  address public constant usdt = address(0xdAC17F958D2ee523a2206206994597C13D831ec7);
+
+  uint256 public constant FLAG_DISABLE_UNISWAP = 0x01;
+  uint256 public constant FLAG_DISABLE_KYBER = 0x02;
+  uint256 public constant FLAG_ENABLE_KYBER_UNISWAP_RESERVE = 0x100000000; // Turned off by default
+  uint256 public constant FLAG_ENABLE_KYBER_OASIS_RESERVE = 0x200000000; // Turned off by default
+  uint256 public constant FLAG_ENABLE_KYBER_BANCOR_RESERVE = 0x400000000; // Turned off by default
+  uint256 public constant FLAG_DISABLE_BANCOR = 0x04;
+  uint256 public constant FLAG_DISABLE_OASIS = 0x08;
+  uint256 public constant FLAG_DISABLE_COMPOUND = 0x10;
+  uint256 public constant FLAG_DISABLE_FULCRUM = 0x20;
+  uint256 public constant FLAG_DISABLE_CHAI = 0x40;
+  uint256 public constant FLAG_DISABLE_AAVE = 0x80;
+  uint256 public constant FLAG_DISABLE_SMART_TOKEN = 0x100;
+  uint256 public constant FLAG_ENABLE_MULTI_PATH_ETH = 0x200; // Turned off by default
+  uint256 public constant FLAG_DISABLE_BDAI = 0x400;
+  uint256 public constant FLAG_DISABLE_IEARN = 0x800;
+  uint256 public constant FLAG_DISABLE_CURVE_COMPOUND = 0x1000;
+  uint256 public constant FLAG_DISABLE_CURVE_USDT = 0x2000;
+  uint256 public constant FLAG_DISABLE_CURVE_Y = 0x4000;
+  uint256 public constant FLAG_DISABLE_CURVE_BINANCE = 0x8000;
+
+  uint256 public constant DISABLED = FLAG_DISABLE_UNISWAP
+  +FLAG_DISABLE_KYBER
+  +FLAG_DISABLE_BANCOR
+  +FLAG_DISABLE_OASIS
+  +FLAG_DISABLE_COMPOUND
+  +FLAG_DISABLE_FULCRUM
+  +FLAG_DISABLE_CHAI
+  +FLAG_DISABLE_AAVE
+  +FLAG_DISABLE_SMART_TOKEN
+  +FLAG_DISABLE_BDAI
+  +FLAG_DISABLE_CURVE_COMPOUND
+  +FLAG_DISABLE_CURVE_USDT
+  +FLAG_DISABLE_IEARN;
 
   constructor () public {
-    dydx = address(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
-    swap = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
-    dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    usdc = address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-    usdt = address(0xdAC17F958D2ee523a2206206994597C13D831ec7);
-
     approveToken();
   }
 
-  function swapUSDCtoDAI(uint256 amount) public {
-    _amount = amount;
+  function approveToken() public {
+      IERC20(dai).safeApprove(dydx, uint(-1));
+
+      IERC20(dai).safeApprove(one, uint(-1));
+      IERC20(usdc).safeApprove(one, uint(-1));
+      IERC20(usdt).safeApprove(one, uint(-1));
+  }
+
+  function max() public {
+    trade(IERC20(dai).balanceOf(dydx));
+  }
+
+  function trade(uint256 amount) public {
     Info[] memory infos = new Info[](1);
     ActionArgs[] memory args = new ActionArgs[](3);
 
@@ -268,7 +321,7 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
     withdraw.actionType = ActionType.Withdraw;
     withdraw.accountId = 0;
     withdraw.amount = wamt;
-    withdraw.primaryMarketId = 2;
+    withdraw.primaryMarketId = 3;
     withdraw.otherAddress = address(this);
 
     args[0] = withdraw;
@@ -281,11 +334,11 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
     args[1] = call;
 
     ActionArgs memory deposit;
-    AssetAmount memory damt = AssetAmount(true, AssetDenomination.Wei, AssetReference.Delta, amount.add(1e6));
+    AssetAmount memory damt = AssetAmount(true, AssetDenomination.Wei, AssetReference.Delta, amount.add(1));
     deposit.actionType = ActionType.Deposit;
     deposit.accountId = 0;
     deposit.amount = damt;
-    deposit.primaryMarketId = 2;
+    deposit.primaryMarketId = 3;
     deposit.otherAddress = address(this);
 
     args[2] = deposit;
@@ -298,23 +351,13 @@ contract CurveFlash is ReentrancyGuard, Ownable, Structs {
       Info memory accountInfo,
       bytes memory data
   ) public {
-    // 0 = DAI, 1 = USDC, 2 = USDT, 3 = TUSD
-    ICurveFi(swap).exchange_underlying(1, 0, _amount, 0);
-    ICurveFi(swap).exchange_underlying(0, 2, IERC20(dai).balanceOf(address(this)), 0);
-    ICurveFi(swap).exchange_underlying(2, 1, IERC20(usdt).balanceOf(address(this)), 0);
+    OneSplit(one).goodSwap(dai, usdt, IERC20(dai).balanceOf(address(this)), 1, 2, DISABLED);
+    OneSplit(one).goodSwap(usdt, dai, IERC20(usdt).balanceOf(address(this)), 1, 2, DISABLED);
+    //OneSplit(one).goodSwap(usdc, dai, IERC20(usdc).balanceOf(address(this)), 1, 4, DISABLED);
   }
 
   function() external payable {
 
-  }
-
-  function approveToken() public {
-      IERC20(dai).safeApprove(swap, uint(-1));
-      IERC20(dai).safeApprove(dydx, uint(-1));
-      IERC20(usdc).safeApprove(swap, uint(-1));
-      IERC20(usdc).safeApprove(dydx, uint(-1));
-      IERC20(usdt).safeApprove(swap, uint(-1));
-      IERC20(usdt).safeApprove(dydx, uint(-1));
   }
 
   // incase of half-way error

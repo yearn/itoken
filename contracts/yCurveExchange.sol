@@ -285,7 +285,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
     address _i = get_address(i);
     yERC20(_i).deposit(IERC20(_ui).balanceOf(address(this)));
 
-    _exchange(i, j, dx, min_dy);
+    _exchange(i, j);
 
     address _j = get_address(j);
     yERC20(_j).withdraw(IERC20(_j).balanceOf(address(this)));
@@ -297,7 +297,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
   function exchange(int128 i, int128 j, uint256 dx, uint256 min_dy) external nonReentrant {
     IERC20(get_address(i)).safeTransferFrom(msg.sender, address(this), dx);
 
-    _exchange(i, j, dx, min_dy);
+    _exchange(i, j);
 
     address _j = get_address(j);
     uint256 _dy = IERC20(_j).balanceOf(address(this));
@@ -305,7 +305,7 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
     IERC20(_j).safeTransfer(msg.sender, _dy);
   }
   // 0 = yDAI, 1 = yUSDC, 2 = yUSDT, 3 = yTUSD, 4 = ySUSD
-  function _exchange(int128 i, int128 j, uint256 dx, uint256 min_dy) internal {
+  function _exchange(int128 i, int128 j) internal {
     if (i == 4) {
       CurveFi(sSWAP).exchange(0, 1, IERC20(get_address(i)).balanceOf(address(this)), 0);
       yCurveFi(ySWAP).remove_liquidity(IERC20(yCURVE).balanceOf(address(this)), [uint256(0),0,0,0]);
@@ -314,9 +314,9 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
       uint256[4] memory amounts;
       amounts[uint256(i)] = IERC20(get_address(i)).balanceOf(address(this));
       yCurveFi(ySWAP).add_liquidity(amounts, 0);
-      CurveFi(sSWAP).exchange(1, 0, IERC20(yCURVE).balanceOf(address(this)), min_dy);
+      CurveFi(sSWAP).exchange(1, 0, IERC20(yCURVE).balanceOf(address(this)), 0);
     } else {
-      CurveFi(ySWAP).exchange(i, j, dx, min_dy);
+      CurveFi(ySWAP).exchange(i, j, IERC20(get_address(i)).balanceOf(address(this)), 0);
     }
   }
   function _swap_to(int128 j) internal {
@@ -447,25 +447,6 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
     _add_liquidity(_amounts, min_mint_amount);
     IERC20(sCURVE).safeTransfer(msg.sender, IERC20(sCURVE).balanceOf(address(this)));
   }
-  function add_liquidity(uint256[5] calldata amounts, uint256 min_mint_amount) external nonReentrant {
-    if (amounts[0] > 0) {
-      IERC20(yDAI).safeTransferFrom(msg.sender, address(this), amounts[0]);
-    }
-    if (amounts[1] > 0) {
-      IERC20(yUSDC).safeTransferFrom(msg.sender, address(this), amounts[1]);
-    }
-    if (amounts[2] > 0) {
-      IERC20(yUSDT).safeTransferFrom(msg.sender, address(this), amounts[2]);
-    }
-    if (amounts[3] > 0) {
-      IERC20(yTUSD).safeTransferFrom(msg.sender, address(this), amounts[3]);
-    }
-    if (amounts[4] > 0) {
-      IERC20(ySUSD).safeTransferFrom(msg.sender, address(this), amounts[4]);
-    }
-    _add_liquidity(amounts, min_mint_amount);
-    IERC20(sCURVE).safeTransfer(msg.sender, IERC20(sCURVE).balanceOf(address(this)));
-  }
   function _add_liquidity(uint256[5] memory amounts, uint256 min_mint_amount) internal {
     uint256[4] memory _y;
     _y[0] = amounts[0];
@@ -519,40 +500,6 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
     require(_dy >= _min_amount, "slippage");
     IERC20(_uj).safeTransfer(msg.sender, _dy);
   }
-  function remove_liquidity_to(int128 j, uint256 _amount, uint256 _min_amount) external nonReentrant {
-    IERC20(sCURVE).safeTransferFrom(msg.sender, address(this), _amount);
-    _remove_liquidity([uint256(0),0,0,0,0]);
-    _swap_to(j);
-    address _j = get_address(j);
-    uint256 _dy = IERC20(_j).balanceOf(address(this));
-    require(_dy >= _min_amount, "slippage");
-    IERC20(_j).safeTransfer(msg.sender, _dy);
-  }
-  function remove_liquidity(uint256 _amount, uint256[5] calldata min_amounts) external nonReentrant {
-    IERC20(sCURVE).safeTransferFrom(msg.sender, address(this), _amount);
-    _remove_liquidity(min_amounts);
-    uint256 _ydai = IERC20(yDAI).balanceOf(address(this));
-    uint256 _yusdc = IERC20(yUSDC).balanceOf(address(this));
-    uint256 _yusdt = IERC20(yUSDT).balanceOf(address(this));
-    uint256 _ytusd = IERC20(yTUSD).balanceOf(address(this));
-    uint256 _ysusd = IERC20(ySUSD).balanceOf(address(this));
-
-    if (_ydai > 0) {
-      IERC20(yDAI).safeTransfer(msg.sender, _ydai);
-    }
-    if (_yusdc > 0) {
-      IERC20(yUSDC).safeTransfer(msg.sender, _yusdc);
-    }
-    if (_yusdt > 0) {
-      IERC20(yUSDT).safeTransfer(msg.sender, _yusdt);
-    }
-    if (_ytusd > 0) {
-      IERC20(yTUSD).safeTransfer(msg.sender, _ytusd);
-    }
-    if (_ysusd > 0) {
-      IERC20(ySUSD).safeTransfer(msg.sender, _ysusd);
-    }
-  }
   function _remove_liquidity(uint256[5] memory min_amounts) internal {
     uint256[2] memory _s;
     _s[0] = min_amounts[4];
@@ -564,87 +511,143 @@ contract yCurveExchange is ReentrancyGuard, Ownable {
     _y[3] = min_amounts[3];
     yCurveFi(ySWAP).remove_liquidity(IERC20(yCURVE).balanceOf(address(this)), _y);
   }
-  // dx = amount sold, dy = amount bought
-  function get_dx_underlying(int128 i, int128 j, uint256 dy) external view returns (uint256) {
-    if (i == 4) { // How much SUSD must I sell to get dy USDT (j)
-      uint256[4] memory _amounts;
-      _amounts[uint256(j)] = dy;
-      uint256 _y = yCurveFi(ySWAP).calc_token_amount(_amounts, false);
-      return CurveFi(sSWAP).get_dx_underlying(0, 1, _y);
-    } else if (j == 4) { // How much USDT must I sell to get dy SUSD (j)
-      uint256 _dx = CurveFi(sSWAP).get_dx_underlying(1, 0, dy); // Amount of curve.fi to sell
-      // Amount of USDT to deposit for that amount of curve.fi
-      return _dx.mul(CurveFi(ySWAP).get_virtual_price()).div(1e18);
-    } else {
-      return CurveFi(ySWAP).get_dx_underlying(i, j, dy);
-    }
-  }
+
   function get_dy_underlying(int128 i, int128 j, uint256 dx) external view returns (uint256) {
     if (i == 4) { // How much j (USDT) will I get, if I sell dx SUSD (i)
-      uint256 _y = CurveFi(sSWAP).get_dy_underlying(0, 1, dx);
-      return _y.mul(CurveFi(ySWAP).get_virtual_price()).div(1e18);
+      uint256 _yt = dx.mul(1e18).div(yERC20(get_address(i)).getPricePerFullShare());
+      uint256 _y = CurveFi(sSWAP).get_dy(0, 1, _yt);
+      return calc_withdraw_amount_y(_y, j);
+      //return _y.mul(1e18).div(CurveFi(ySWAP).get_virtual_price()).div(decimals[uint256(j)]);
     } else if (j == 4) { // How much SUSD (j) will I get, if I sell dx USDT (i)
       uint256[4] memory _amounts;
-      _amounts[uint256(i)] = dx;
+      _amounts[uint256(i)] = dx.mul(1e18).div(yERC20(get_address(i)).getPricePerFullShare());
       uint256 _y = yCurveFi(ySWAP).calc_token_amount(_amounts, true);
-      return CurveFi(sSWAP).get_dy_underlying(0, 1, _y);
+      uint256 _fee = _y.mul(4).div(10000);
+      return CurveFi(sSWAP).get_dy_underlying(1, 0, _y.sub(_fee));
     } else {
-      return CurveFi(ySWAP).get_dy_underlying(i, j, dx);
-    }
-  }
-  function get_dx(int128 i, int128 j, uint256 dy) external view returns (uint256) {
-    if (i == 4) { // How much ySUSD must I sell to get dy yUSDT (j)
-      uint256[4] memory _amounts;
-      _amounts[uint256(j)] = dy.mul(yERC20(get_address(j)).getPricePerFullShare()).div(1e18);
-      uint256 _y = yCurveFi(ySWAP).calc_token_amount(_amounts, false);
-      return CurveFi(sSWAP).get_dx(0, 1, _y);
-    } else if (j == 4) { // How much USDT must I sell to get dy ySUSD (j)
-      uint256 _dx = CurveFi(sSWAP).get_dx(1, 0, dy);
-      // Amount of yCurve.fi to sell
-      uint256 _ydx = _dx.mul(CurveFi(ySWAP).get_virtual_price()).div(1e18);
-      return _ydx.mul(1e18).div(yERC20(get_address(i)).getPricePerFullShare());
-    } else {
-      return CurveFi(ySWAP).get_dx(i, j, dy);
+      uint256 _dy = CurveFi(ySWAP).get_dy_underlying(i, j, dx);
+      return _dy.sub(_dy.mul(4).div(10000));
     }
   }
 
   function get_dy(int128 i, int128 j, uint256 dx) external view returns (uint256) {
-    if (i == 4) { // How much j (yUSDT) will I get, if I sell dx ySUSD (i)
+    if (i == 4) { // How much j (USDT) will I get, if I sell dx SUSD (i)
       uint256 _y = CurveFi(sSWAP).get_dy(0, 1, dx);
-      uint256 _u = _y.mul(CurveFi(ySWAP).get_virtual_price()).div(1e18);
-      return _u.mul(1e18).div(yERC20(get_address(j)).getPricePerFullShare());
+      uint256 _j = calc_withdraw_amount_y(_y, j);
+      return _j.mul(yERC20(get_address(j)).getPricePerFullShare()).div(1e18);
     } else if (j == 4) { // How much SUSD (j) will I get, if I sell dx USDT (i)
       uint256[4] memory _amounts;
-      _amounts[uint256(i)] = dx.mul(yERC20(get_address(i)).getPricePerFullShare()).div(1e18);
+      _amounts[uint256(i)] = dx;
       uint256 _y = yCurveFi(ySWAP).calc_token_amount(_amounts, true);
-      return CurveFi(sSWAP).get_dy(0, 1, _y);
+      uint256 _fee = _y.mul(4).div(10000);
+      return CurveFi(sSWAP).get_dy(1, 0, _y.sub(_fee));
     } else {
-      return CurveFi(ySWAP).get_dy(i, j, dx);
+      uint256 _dy = CurveFi(ySWAP).get_dy(i, j, dx);
+      return _dy.sub(_dy.mul(4).div(10000));
     }
   }
 
-  function calc_token_amount(uint256[5] calldata amounts, bool deposit) external view returns (uint256) {
+  function calc_withdraw_amount_y(uint256 amount, int128 j) public view returns (uint256) {
+    uint256 _ytotal = IERC20(yCURVE).totalSupply();
+
+    uint256 _yDAI = IERC20(yDAI).balanceOf(ySWAP);
+    uint256 _yUSDC = IERC20(yUSDC).balanceOf(ySWAP);
+    uint256 _yUSDT = IERC20(yUSDT).balanceOf(ySWAP);
+    uint256 _yTUSD = IERC20(yTUSD).balanceOf(ySWAP);
+
+    uint256[4] memory _amounts;
+    _amounts[0] = _yDAI.mul(amount).div(_ytotal);
+    _amounts[1] = _yUSDC.mul(amount).div(_ytotal);
+    _amounts[2] = _yUSDT.mul(amount).div(_ytotal);
+    _amounts[3] = _yTUSD.mul(amount).div(_ytotal);
+
+    uint256 _base = _calc_to(_amounts, j).mul(yERC20(get_address(j)).getPricePerFullShare()).div(1e18);
+    uint256 _fee = _base.mul(4).div(10000);
+    return _base.sub(_fee);
+  }
+  function _calc_to(uint256[4] memory _amounts, int128 j) public view returns (uint256) {
+    if (j == 0) {
+      return _calc_to_dai(_amounts);
+    } else if (j == 1) {
+      return _calc_to_usdc(_amounts);
+    } else if (j == 2) {
+      return _calc_to_usdt(_amounts);
+    } else if (j == 3) {
+      return _calc_to_tusd(_amounts);
+    }
+  }
+
+  function _calc_to_dai(uint256[4] memory _amounts) public view returns (uint256) {
+    uint256 _from_usdc = CurveFi(ySWAP).get_dy(1, 0, _amounts[1]);
+    uint256 _from_usdt = CurveFi(ySWAP).get_dy(2, 0, _amounts[2]);
+    uint256 _from_tusd = CurveFi(ySWAP).get_dy(3, 0, _amounts[3]);
+    return _amounts[0].add(_from_usdc).add(_from_usdt).add(_from_tusd);
+  }
+  function _calc_to_usdc(uint256[4] memory _amounts) public view returns (uint256) {
+    uint256 _from_dai = CurveFi(ySWAP).get_dy(0, 1, _amounts[0]);
+    uint256 _from_usdt = CurveFi(ySWAP).get_dy(2, 1, _amounts[2]);
+    uint256 _from_tusd = CurveFi(ySWAP).get_dy(3, 1, _amounts[3]);
+    return _amounts[1].add(_from_dai).add(_from_usdt).add(_from_tusd);
+  }
+  function _calc_to_usdt(uint256[4] memory _amounts) public view returns (uint256) {
+    uint256 _from_dai = CurveFi(ySWAP).get_dy(0, 2, _amounts[0]);
+    uint256 _from_usdc = CurveFi(ySWAP).get_dy(1, 2, _amounts[1]);
+    uint256 _from_tusd = CurveFi(ySWAP).get_dy(3, 2, _amounts[3]);
+    return _amounts[2].add(_from_dai).add(_from_usdc).add(_from_tusd);
+  }
+  function _calc_to_tusd(uint256[4] memory _amounts) public view returns (uint256) {
+    uint256 _from_dai = CurveFi(ySWAP).get_dy(0, 3, _amounts[0]);
+    uint256 _from_usdc = CurveFi(ySWAP).get_dy(1, 3, _amounts[1]);
+    uint256 _from_usdt = CurveFi(ySWAP).get_dy(2, 3, _amounts[2]);
+    return _amounts[3].add(_from_dai).add(_from_usdc).add(_from_usdt);
+  }
+
+  function calc_withdraw_amount(uint256 amount) external view returns (uint256[5] memory) {
+    uint256 _stotal = IERC20(sCURVE).totalSupply();
+    uint256 _ytotal = IERC20(yCURVE).totalSupply();
+    uint256 _yCURVE = IERC20(yCURVE).balanceOf(sSWAP);
+
+    uint256 _yshares = _yCURVE.mul(amount).div(_stotal);
+
+    uint256[5] memory _amounts;
+    _amounts[0] = IERC20(yDAI).balanceOf(ySWAP);
+    _amounts[1] = IERC20(yUSDC).balanceOf(ySWAP);
+    _amounts[2] = IERC20(yUSDT).balanceOf(ySWAP);
+    _amounts[3] = IERC20(yTUSD).balanceOf(ySWAP);
+    _amounts[4] = IERC20(ySUSD).balanceOf(sSWAP);
+
+    _amounts[0] = _amounts[0].mul(_yshares).div(_ytotal);
+    _amounts[0] = _amounts[0].sub(_amounts[0].mul(4).div(10000));
+    _amounts[1] = _amounts[1].mul(_yshares).div(_ytotal);
+    _amounts[1] = _amounts[1].sub(_amounts[1].mul(4).div(10000));
+    _amounts[2] = _amounts[2].mul(_yshares).div(_ytotal);
+    _amounts[2] = _amounts[2].sub(_amounts[2].mul(4).div(10000));
+    _amounts[3] = _amounts[3].mul(_yshares).div(_ytotal);
+    _amounts[3] = _amounts[3].sub(_amounts[3].mul(4).div(10000));
+    _amounts[4] = _amounts[4].mul(amount).div(_stotal);
+    _amounts[4] = _amounts[4].sub(_amounts[4].mul(4).div(10000));
+
+    return _amounts;
+  }
+
+  function calc_deposit_amount(uint256[5] calldata amounts) external view returns (uint256) {
     uint256[4] memory _y;
-    _y[0] = amounts[0];
-    _y[1] = amounts[1];
-    _y[2] = amounts[2];
-    _y[3] = amounts[3];
-    uint256 _y_output = yCurveFi(ySWAP).calc_token_amount(_y, deposit);
+    _y[0] = amounts[0].mul(1e18).div(yERC20(yDAI).getPricePerFullShare());
+    _y[1] = amounts[1].mul(1e18).div(yERC20(yUSDC).getPricePerFullShare());
+    _y[2] = amounts[2].mul(1e18).div(yERC20(yUSDT).getPricePerFullShare());
+    _y[3] = amounts[3].mul(1e18).div(yERC20(yTUSD).getPricePerFullShare());
+    uint256 _y_output = yCurveFi(ySWAP).calc_token_amount(_y, true);
     uint256[2] memory _s;
-    _s[0] = amounts[4];
-    _s[1] = _y_output;
-    return sCurveFi(sSWAP).calc_token_amount(_s, deposit);
+    _s[0] = amounts[4].mul(1e18).div(yERC20(ySUSD).getPricePerFullShare());
+    _s[1] = _y_output.mul(1e18).div(CurveFi(ySWAP).get_virtual_price());
+    uint256 _base = sCurveFi(sSWAP).calc_token_amount(_s, true);
+    uint256 _fee = _base.mul(4).div(10000);
+    return _base.sub(_fee);
   }
 
   // incase of half-way error
   function inCaseTokenGetsStuck(IERC20 _TokenAddress) onlyOwner public {
       uint qty = _TokenAddress.balanceOf(address(this));
       _TokenAddress.safeTransfer(msg.sender, qty);
-  }
-
-  // incase of half-way error
-  function inCaseETHGetsStuck() onlyOwner public{
-      (bool result, ) = msg.sender.call.value(address(this).balance)("");
-      require(result, "transfer of ETH failed");
   }
 }
