@@ -16,7 +16,7 @@
     "solc": "^0.6.1"
   },
   "devDependencies": {
-    "@openzeppelin/contracts": "^2.4.0",
+    "@openzeppelin/contracts": "^4.4.2",
     "@truffle/hdwallet-provider": "^1.0.28",
     "bignumber": "^1.1.0",
     "bignumber.js": "^9.0.0",
