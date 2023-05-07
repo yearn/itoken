@@ -26,6 +26,6 @@
     "ethereumjs-util": "^5.2.0",
     "openzeppelin-test-helpers": "^0.5.1",
     "truffle-hdwallet-provider": "^1.0.17",
-    "web3": "1.0.0-beta.33"
+    "web3": "1.9.0"
   }
 }
